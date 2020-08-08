@@ -6,9 +6,7 @@ const router = express.Router();
 const userController = require("../../controllers/user/userController"),
     {
         authorizeUser
-    } = require("../../middleware/auth");
-
-
+    } = require("../../../middleware/auth");
 
 // create new user
 router.post("/new", (req, res) => userController.createUser(req, res));

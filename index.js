@@ -14,7 +14,9 @@ const secrets = require("./config/secrets");
 mongoose.connect(dbPath, dbOpts);
 
 // import routes
-// const authRoutes = require("./routes/auth/auth");
+const authRoutes = require("./api/routes/auth/auth");
+const userRoutes = require("./api/routes/user/user");
+const trackRoutes = require("./api/routes/track/track");
 
 // create express server
 const server = express();
@@ -43,7 +45,9 @@ server.listen(PORT, () => {
 });
 
 // * ROUTES *
-// server.use("/auth", authRoutes);
+server.use("/auth", authRoutes);
+server.use("/user", userRoutes);
+server.use("/track", trackRoutes);
 
 // index route
 server.get("/", (req, res) => res.send({
