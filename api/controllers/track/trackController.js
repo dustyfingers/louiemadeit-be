@@ -3,6 +3,7 @@ const Track = require("../../models/Track");
 
 module.exports = {
     createTrack: async (req, res) => {
+        console.log("this track wants to be created!");
         // pull props off of request
         const {
             email

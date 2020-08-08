@@ -48,6 +48,20 @@ let Track = new Schema({
         default: false,
         required: true
     },
+    prices: {
+        exclusivePrice: {
+            type: Number,
+            default: 149.99
+        },
+        leasePriceMaster: {
+            type: Number,
+            default: 29.99
+        },
+        leasePriceStems: {
+            type: Number,
+            default: 49.99
+        },
+    },
     createdAt: {
         type: Date,
         default: Date.now

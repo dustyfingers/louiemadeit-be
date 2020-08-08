@@ -17,6 +17,7 @@ mongoose.connect(dbPath, dbOpts);
 const authRoutes = require("./api/routes/auth/auth");
 const userRoutes = require("./api/routes/user/user");
 const trackRoutes = require("./api/routes/track/track");
+const s3Routes = require("./api/routes/s3/s3");
 
 // create express server
 const server = express();
@@ -48,6 +49,7 @@ server.listen(PORT, () => {
 server.use("/auth", authRoutes);
 server.use("/user", userRoutes);
 server.use("/track", trackRoutes);
+server.use("/s3", s3Routes);
 
 // index route
 server.get("/", (req, res) => res.send({
