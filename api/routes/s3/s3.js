@@ -12,10 +12,13 @@ const s3Controller = require("../../controllers/s3/s3Controller"),
         authorizeUser
     } = require("../../../middleware/auth");
 
+
+// TODO: make these endpoints admin only!
+
 // generate put s3 url
-// TODO: admin only!
 router.get("/generate-put-url", (req, res) => s3Controller.generatePutUrl(req, res));
 
 // generate get s3 url
 router.get("/generate-get-url", (req, res) => s3Controller.generateGetUrl(req, res));
+
 module.exports = router;

@@ -51,7 +51,7 @@ server.use("/user", userRoutes);
 server.use("/track", trackRoutes);
 server.use("/s3", s3Routes);
 
-// index route
+// sanity route
 server.get("/", (req, res) => res.send({
     msg: "INDEX"
 }));

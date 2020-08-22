@@ -17,6 +17,7 @@ module.exports = {
                 message: "This is happening!",
                 data: req.body
             };
+            console.log(responseBody);
             res.status(200).send(responseBody);
 
             // connect to s3 bucket, and upload all rich media
@@ -32,5 +33,7 @@ module.exports = {
             };
             res.status(400).send(responseBody);
         }
-    }
+    },
+    fetchAllCurrentTracks: async (req, res) => {},
+    fetchSingleTrack: async (req, res) => {}
 };
