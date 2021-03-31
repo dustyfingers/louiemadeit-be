@@ -38,10 +38,12 @@ server.use((req, res, next) => {
     next();
 });
 
-// determine port and start server
+// determine port and environment and start server
 const PORT = process.env.PORT || 5000;
+const ENVIRONMENT = server.get('env');
+
 server.listen(PORT, () => {
-    console.log(`ENVIRONMENT: ${secrets.environment}`);
+    console.log(`ENVIRONMENT: ${ENVIRONMENT}`);
     console.log(`SERVER STARTED ON PORT: ${PORT}`);
 });
 

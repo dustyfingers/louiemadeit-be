@@ -8,5 +8,5 @@ const stripe = require("stripe")(stripeTest_sk);
 
 module.exports = {
     stripe,
-    stripeStatementDescriptor: "Raw Dog! Dog Food, LLC"
+    stripeStatementDescriptor: "louiemadeit llc"
 };
