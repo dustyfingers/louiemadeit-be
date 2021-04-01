@@ -8,7 +8,7 @@ const authController = require("../../controllers/auth/authController");
 const router = express.Router();
 
 // user sign in
-router.post("/signin", (req, res) => authController.signInUser(req, res));
+router.post("/sign-in", (req, res) => authController.signInUser(req, res));
 
 // TODO: user 'logout'
 

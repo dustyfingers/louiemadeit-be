@@ -1,5 +1,5 @@
 // import libs/other
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 // import user model and auth helpers
 const User = require("../../models/User"),

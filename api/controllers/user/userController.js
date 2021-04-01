@@ -49,17 +49,5 @@ module.exports = {
             };
             res.status(400).send(responseBody);
         }
-    },
-    fetchUserDashboard: async (req, res) => {
-        const {
-            email
-        } = req.body;
-        const user = await User.findOne({
-            email
-        });
-        res.status(200).send({
-            success: 1,
-            user
-        });
     }
 };

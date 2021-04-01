@@ -20,10 +20,7 @@ module.exports = {
             console.log(responseBody);
             res.status(200).send(responseBody);
 
-            // connect to s3 bucket, and upload all rich media
-
-            // if all uploads are successful
-            // save urls to mongodnb doc
+            // save given urls to mongodb doc
 
         } catch (err) {
             const responseBody = {
