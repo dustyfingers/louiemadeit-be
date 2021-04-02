@@ -28,7 +28,7 @@ server.use(express.json());
 server.use(bodyParser.urlencoded({
     extended: true
 }));
-server.use(cookieParser());
+server.use(cookieParser('cookies key secret junk here sgawsryserfg'));
 server.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader(
@@ -37,6 +37,7 @@ server.use((req, res, next) => {
     );
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     res.setHeader("Content-Type", "application/json");
+    res.header('Access-Control-Allow-Credentials', true);
     next();
 });
 

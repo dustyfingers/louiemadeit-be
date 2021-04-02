@@ -44,14 +44,15 @@ module.exports = {
             const accessToken = generateToken(email, "access");
             
             // set auth cookies
-            res.cookie(REFRESH_COOKIE_NAME, refreshToken, {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true});
-            res.cookie(EMAIL_COOKIE_NAME, email, {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true});
-            res.cookie(ACCESS_COOKIE_NAME, accessToken, {maxAge: MAX_AGE_ONE_DAY, httpOnly: true});
+            res.cookie(REFRESH_COOKIE_NAME, refreshToken, {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true, signed: true, domain: ".app.localhost"});
+            res.cookie(EMAIL_COOKIE_NAME, email, {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true, signed: true, domain: ".app.localhost"});
+            res.cookie(ACCESS_COOKIE_NAME, accessToken, {maxAge: MAX_AGE_ONE_DAY, httpOnly: true, signed: true, domain: ".app.localhost"});
 
             // send response
             res.status(200).send({
                 success: 1,
-                message: "User created successfully"
+                message: "User created successfully",
+                cookies: req.signedCookies
             });
         } catch (err) {
             const responseBody = {

@@ -41,9 +41,9 @@ module.exports = {
                             const refreshToken = generateToken(email, "refresh");
 
                             // set cookies
-                            res.cookie(REFRESH_COOKIE_NAME, refreshToken, {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true});
-                            res.cookie(EMAIL_COOKIE_NAME, email, {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true});
-                            res.cookie(ACCESS_COOKIE_NAME, accessToken, {maxAge: MAX_AGE_ONE_DAY, httpOnly: true});
+                            res.cookie(REFRESH_COOKIE_NAME, refreshToken, {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true, signed: true, domain: ".app.localhost"});
+                            res.cookie(EMAIL_COOKIE_NAME, email, {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true, signed: true, domain: ".app.localhost"});
+                            res.cookie(ACCESS_COOKIE_NAME, accessToken, {maxAge: MAX_AGE_ONE_DAY, httpOnly: true, signed: true, domain: ".app.localhost"});
 
                             res.status(200).send({
                                 success: 1,
@@ -89,15 +89,12 @@ module.exports = {
             const { louiemadeitRefresh, louiemadeitAccess, louiemadeitEmail } = req.cookies;
 
             try {
-                console.log('already has session!!');
-    
                 // if access token is valid 
                 // sign in user
                 let decodedAccessEmail = decodeToken(louiemadeitAccess);
                 let decodedRefreshEmail = decodeToken(louiemadeitRefresh);
 
                 if (decodedAccessEmail && (decodedAccessEmail === louiemadeitEmail)) {
-                    console.log(decodedAccessEmail);
                     res.status(200).send({
                         success: 1,
                         message: "Sign In Successful",
@@ -110,7 +107,7 @@ module.exports = {
                 else if (decodedRefreshEmail && (decodedRefreshEmail === louiemadeitEmail)) {
                     const newAccessToken = generateToken(louiemadeitEmail, "access");
                     
-                    res.cookie(ACCESS_COOKIE_NAME, newAccessToken, {maxAge:MAX_AGE_ONE_DAY, httpOnly: true});
+                    res.cookie(ACCESS_COOKIE_NAME, newAccessToken, {maxAge:MAX_AGE_ONE_DAY, httpOnly: true, signed: true, domain: ".app.localhost"});
 
                     res.status(200).send({
                         success: 1,
@@ -120,9 +117,9 @@ module.exports = {
                 } 
                 // if neither are valid set cookies to empty and return an error
                 else {
-                res.cookie(REFRESH_COOKIE_NAME, '', {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true});
-                res.cookie(EMAIL_COOKIE_NAME, '', {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true});
-                res.cookie(ACCESS_COOKIE_NAME, '', {maxAge: MAX_AGE_ONE_DAY, httpOnly: true});
+                res.cookie(REFRESH_COOKIE_NAME, '', {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true, signed: true, domain: ".app.localhost"});
+                res.cookie(EMAIL_COOKIE_NAME, '', {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true, signed: true, domain: ".app.localhost"});
+                res.cookie(ACCESS_COOKIE_NAME, '', {maxAge: MAX_AGE_ONE_DAY, httpOnly: true, signed: true, domain: ".app.localhost"});
                 res.status(401).send({
                     success: 1,
                     message: "Tokens Invlaid. Please Sign In Again."
@@ -148,9 +145,9 @@ module.exports = {
                 message: "User Already Signed Out. Redirecting..."
             });
         } else {
-            res.cookie(REFRESH_COOKIE_NAME, '', {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true});
-            res.cookie(EMAIL_COOKIE_NAME, '', {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true});
-            res.cookie(ACCESS_COOKIE_NAME, '', {maxAge: MAX_AGE_ONE_DAY, httpOnly: true});
+            res.cookie(REFRESH_COOKIE_NAME, '', {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true, signed: true, domain: ".app.localhost"});
+            res.cookie(EMAIL_COOKIE_NAME, '', {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true, signed: true, domain: ".app.localhost"});
+            res.cookie(ACCESS_COOKIE_NAME, '', {maxAge: MAX_AGE_ONE_DAY, httpOnly: true, signed: true, domain: ".app.localhost"});
             res.status(200).send({
                 success: 1,
                 message: "Sign Out Successful"
