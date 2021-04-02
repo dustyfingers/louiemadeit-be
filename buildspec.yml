@@ -7,11 +7,7 @@ phases:
       - npm install
   build:
     commands:
-      - echo Build started on `date`
       - npm run-script build
-  post_build:
-    commands:
-      - echo Build completed on `date`
 # Include only the files required for your application to run.
 artifacts:
   files:

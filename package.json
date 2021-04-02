@@ -5,7 +5,8 @@
     "main": "index.js",
     "scripts": {
         "dev": "nodemon index.js",
-        "prod": "node index.js"
+        "prod": "node index.js",
+        "build": "install"
     },
     "keywords": [],
     "author": "",
