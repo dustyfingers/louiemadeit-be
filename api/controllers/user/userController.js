@@ -3,7 +3,11 @@ const User = require("../../models/User"),
     {
         saltAndHashPw,
         generateToken,
-        setAuthCookie
+        ACCESS_COOKIE_NAME,
+        REFRESH_COOKIE_NAME,
+        EMAIL_COOKIE_NAME,
+        MAX_AGE_ONE_DAY,
+        MAX_AGE_THIRTY_DAYS
     } = require("../../../helpers/auth");
 
 module.exports = {
@@ -39,13 +43,15 @@ module.exports = {
             const refreshToken = generateToken(email, "refresh");
             const accessToken = generateToken(email, "access");
             
-            // set auth cookie
-            setAuthCookie(res, refreshToken, 'refresh');
-            setAuthCookie(res, accessToken, 'access');
+            // set auth cookies
+            res.cookie(REFRESH_COOKIE_NAME, refreshToken, {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true});
+            res.cookie(EMAIL_COOKIE_NAME, email, {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true});
+            res.cookie(ACCESS_COOKIE_NAME, accessToken, {maxAge: MAX_AGE_ONE_DAY, httpOnly: true});
 
             // send response
             res.status(200).send({
-                success: 1
+                success: 1,
+                message: "User created successfully"
             });
         } catch (err) {
             const responseBody = {
