@@ -2,7 +2,8 @@
 const User = require("../../models/User"),
     {
         saltAndHashPw,
-        generateToken
+        generateToken,
+        setAuthCookie
     } = require("../../../helpers/auth");
 
 module.exports = {
@@ -39,14 +40,12 @@ module.exports = {
             const accessToken = generateToken(email, "access");
             
             // set auth cookie
-            res.cookie('louiemadeitRefresh', refreshToken, {maxAge: 86400, httpOnly: true});
-            res.cookie('louiemadeitEmail', email, {maxAge: 86400, httpOnly: true});
+            setAuthCookie(res, refreshToken, 'refresh');
+            setAuthCookie(res, accessToken, 'access');
 
             // send response
             res.status(200).send({
-                success: 1,
-                refreshToken,
-                accessToken
+                success: 1
             });
         } catch (err) {
             const responseBody = {

@@ -42,5 +42,10 @@ module.exports = {
         } catch (err) {
             return false;
         }
-    }
+    },
+    REFRESH_COOKIE_NAME: "louiemadeitRefresh",
+    ACCESS_COOKIE_NAME: "louiemadeitAccess",
+    EMAIL_COOKIE_NAME: "louiemadeitEmail",
+    MAX_AGE_THIRTY_DAYS: 2592000,
+    MAX_AGE_ONE_DAY: 86400
 };
