@@ -18,16 +18,17 @@ module.exports = {
         try {
             // salt and hash pw
             const hash = saltAndHashPw(password);
+            let userCreated;
 
             // create a user in db
             if (isAdmin) {
-                var userCreated = await User.create({
+                userCreated = await User.create({
                     email,
                     hash,
                     isAdmin
                 });
             } else {
-                var userCreated = await User.create({
+                userCreated = await User.create({
                     email,
                     hash
                 });
@@ -36,6 +37,12 @@ module.exports = {
             // generate tokens and send response
             const refreshToken = generateToken(email, "refresh");
             const accessToken = generateToken(email, "access");
+            
+            // set auth cookie
+            res.cookie('louiemadeitRefresh', refreshToken, {maxAge: 86400, httpOnly: true});
+            res.cookie('louiemadeitEmail', email, {maxAge: 86400, httpOnly: true});
+
+            // send response
             res.status(200).send({
                 success: 1,
                 refreshToken,

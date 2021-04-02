@@ -10,8 +10,6 @@ const router = express.Router();
 // user sign in
 router.post("/sign-in", (req, res) => authController.signInUser(req, res));
 
-// TODO: user 'logout'
-
 // TODO: user forgot password
 
 module.exports = router;

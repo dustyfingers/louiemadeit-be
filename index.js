@@ -1,7 +1,8 @@
 // import libs/other
 const express = require("express"),
     bodyParser = require("body-parser"),
-    mongoose = require("mongoose");
+    mongoose = require("mongoose"),
+    cookieParser = require("cookie-parser");
 
 // import config files
 const {
@@ -27,6 +28,7 @@ server.use(express.json());
 server.use(bodyParser.urlencoded({
     extended: true
 }));
+server.use(cookieParser());
 server.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader(
