@@ -43,16 +43,17 @@ module.exports = {
             const refreshToken = generateToken(email, "refresh");
             const accessToken = generateToken(email, "access");
             
-            // set auth cookies
-            res.cookie(REFRESH_COOKIE_NAME, refreshToken, {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true, signed: true, domain: ".app.localhost"});
-            res.cookie(EMAIL_COOKIE_NAME, email, {maxAge: MAX_AGE_THIRTY_DAYS, httpOnly: true, signed: true, domain: ".app.localhost"});
-            res.cookie(ACCESS_COOKIE_NAME, accessToken, {maxAge: MAX_AGE_ONE_DAY, httpOnly: true, signed: true, domain: ".app.localhost"});
+            // set session data for cookies
+            req.session.louiemadeitRefresh = refreshToken;
+            req.session.louiemadeitEmail = email;
+            req.session.louiemadeitAccess = accessToken;
+
+            console.log(req.session.cookie);
 
             // send response
             res.status(200).send({
                 success: 1,
-                message: "User created successfully",
-                cookies: req.signedCookies
+                message: "User created successfully"
             });
         } catch (err) {
             const responseBody = {
