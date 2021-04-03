@@ -24,12 +24,9 @@ module.exports = {
         const {
             Key
         } = req.query;
-        console.log(Key);
         const getUrl = await generateUrlHelper("get", {
             Key
         });
-
-        console.log(getUrl);
 
         getUrl ? res.send({
             getUrl

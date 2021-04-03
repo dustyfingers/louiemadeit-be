@@ -3,25 +3,14 @@ const Track = require("../../models/Track");
 
 module.exports = {
     createTrack: async (req, res) => {
-        console.log("this track wants to be created!");
-        // pull props off of request
-        const {
-            email
-        } = req.body;
-
-        // create the track
         try {
-            console.log("this track wants to be created!");
-            const responseBody = {
+            const track = await Track.create(req.body);
+
+            res.status(200).send({
                 status: 1,
-                message: "This is happening!",
-                data: req.body
-            };
-            console.log(responseBody);
-            res.status(200).send(responseBody);
-
-            // save given urls to mongodb doc
-
+                message: "Track created successfully.",
+                data: track
+            });
         } catch (err) {
             const responseBody = {
                 status: 0,
@@ -31,6 +20,23 @@ module.exports = {
             res.status(400).send(responseBody);
         }
     },
-    fetchAllCurrentTracks: async (req, res) => {},
+    fetchAllCurrentTracks: async (req, res) => {
+        try {
+            const tracks = await Track.find();
+
+            res.status(200).send({
+                status: 1,
+                message: "Here are the tracks for the shop!",
+                tracks
+            });
+        } catch (err) {
+            const responseBody = {
+                status: 0,
+                message: "There was an error fetching the tracks for the shop.",
+                err
+            };
+            res.status(400).send(responseBody);
+        }
+    },
     fetchSingleTrack: async (req, res) => {}
 };

@@ -50,10 +50,6 @@ module.exports = {
                                 req.session.louiemadeitAccess = accessToken;
                                 req.session.cookie.sameSite = 'none';
     
-                                // this is the session right before the response is sent
-                                console.log('session riiiight before response sent to user:', req.session);
-                                console.log(req.sessionID)
-    
                                 res.status(200).send({
                                     success: 1,
                                     message: "Sign In Successful",
@@ -98,7 +94,6 @@ module.exports = {
             // if the client is authenticating using cookies
             else {
                 req.session.isAuth = true;
-                console.log('no email or tokens', req);
                 res.send({session: 'junk here'})
             }
 
