@@ -19,7 +19,7 @@ const generateUrlHelper = (type, opts) => {
             const params = {
                 Bucket: bucketName,
                 Key,
-                Expires: 120 // 2 minutes
+                Expires: 21600 // 6 hours
             };
             // Note operation in this case is getObject
             s3.getSignedUrl('getObject', params, (err, url) => {
