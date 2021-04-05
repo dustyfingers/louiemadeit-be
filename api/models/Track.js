@@ -2,31 +2,25 @@ let mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 let Track = new Schema({
-    name: {
+    trackName: {
         type: String,
-        unique: true,
         required: true
     },
     taggedVersion: {
-        url: String
+        type: String,
+        required: true
     },
     untaggedVersion: {
-        url: String
+        type: String,
+        required: true
     },
-    stems: [{
-        name: {
-            type: String,
-            unique: true,
-            required: true
-        },
-        url: {
-            type: String,
-            unique: true,
-            required: true
-        },
-    }],
+    stems: {
+        type: String,
+        required: true
+    },
     coverArt: {
-        url: String
+        type: String,
+        required: true
     },
     canBeSoldAsLease: {
         type: Boolean,

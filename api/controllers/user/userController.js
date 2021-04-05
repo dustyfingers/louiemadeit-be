@@ -2,7 +2,12 @@
 const User = require("../../models/User"),
     {
         saltAndHashPw,
-        generateToken
+        generateToken,
+        ACCESS_COOKIE_NAME,
+        REFRESH_COOKIE_NAME,
+        EMAIL_COOKIE_NAME,
+        MAX_AGE_ONE_DAY,
+        MAX_AGE_THIRTY_DAYS
     } = require("../../../helpers/auth");
 
 module.exports = {
@@ -18,16 +23,17 @@ module.exports = {
         try {
             // salt and hash pw
             const hash = saltAndHashPw(password);
+            let userCreated;
 
             // create a user in db
             if (isAdmin) {
-                var userCreated = await User.create({
+                userCreated = await User.create({
                     email,
                     hash,
                     isAdmin
                 });
             } else {
-                var userCreated = await User.create({
+                userCreated = await User.create({
                     email,
                     hash
                 });
@@ -36,10 +42,18 @@ module.exports = {
             // generate tokens and send response
             const refreshToken = generateToken(email, "refresh");
             const accessToken = generateToken(email, "access");
+            
+            // set session data for cookies
+            req.session.louiemadeitRefresh = refreshToken;
+            req.session.louiemadeitEmail = email;
+            req.session.louiemadeitAccess = accessToken;
+
+            console.log(req.session.cookie);
+
+            // send response
             res.status(200).send({
                 success: 1,
-                refreshToken,
-                accessToken
+                message: "User created successfully"
             });
         } catch (err) {
             const responseBody = {

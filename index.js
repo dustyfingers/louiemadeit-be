@@ -1,7 +1,11 @@
 // import libs/other
 const express = require("express"),
     bodyParser = require("body-parser"),
-    mongoose = require("mongoose");
+    mongoose = require("mongoose"),
+    cookieParser = require("cookie-parser"),
+    cors = require("cors"),
+    session = require("express-session"),
+    MongoDBSession = require("connect-mongodb-session")(session);
 
 // import config files
 const {
@@ -13,6 +17,12 @@ const secrets = require("./config/secrets");
 // connect to db
 mongoose.connect(dbPath, dbOpts);
 
+// create session store
+const store = MongoDBSession({
+    uri: dbPath,
+    collection: 'sessions'
+});
+
 // import routes
 const authRoutes = require("./api/routes/auth/auth");
 const userRoutes = require("./api/routes/user/user");
@@ -22,21 +32,29 @@ const s3Routes = require("./api/routes/s3/s3");
 // create express server
 const server = express();
 
-// configure cors and json
+// configure middlewares
 server.use(express.json());
+server.use(session({
+    secret: secrets.sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    store
+}));
 server.use(bodyParser.urlencoded({
     extended: true
 }));
-server.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
-        "Access-Control-Allow-Methods",
-        "GET, POST, PUT, PATCH, DELETE"
-    );
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.setHeader("Content-Type", "application/json");
-    next();
-});
+server.use(cookieParser());
+server.use(cors({ origin: "http://localhost:3000", credentials: true }));
+
+server.use(function(req, res, next) {
+    res.header('Content-Type', 'application/json;charset=UTF-8')
+    res.header('Access-Control-Allow-Credentials', true)
+    res.header(
+        'Access-Control-Allow-Headers',
+        'Origin, X-Requested-With, Content-Type, Accept'
+    )
+    next()
+})
 
 // determine port and environment and start server
 const PORT = process.env.PORT || 5000;
@@ -54,6 +72,10 @@ server.use("/track", trackRoutes);
 server.use("/s3", s3Routes);
 
 // sanity route
-server.get("/", (req, res) => res.send({
-    msg: "INDEX"
-}));
+server.get("/", (req, res) => {
+    // // ! important
+    req.session.isAuth = true;
+    // console.log(req.session);
+    res.send({ msg: "INDEX" });
+}
+);
