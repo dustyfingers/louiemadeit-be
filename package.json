@@ -22,7 +22,7 @@
         "helmet": "^4.0.0",
         "jsonwebtoken": "^8.5.1",
         "mongoose": "^5.9.28",
-        "stripe": "^8.84.0"
+        "stripe": "^8.142.0"
     },
     "devDependencies": {
         "nodemon": "^2.0.4"
