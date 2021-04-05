@@ -14,8 +14,12 @@ const {
 } = require("./config/db");
 const secrets = require("./config/secrets");
 
+console.log('server started!')
+
 // connect to db
 mongoose.connect(dbPath, dbOpts);
+
+console.log('db connection happens!')
 
 // create session store
 const store = MongoDBSession({
