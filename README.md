@@ -1,2 +1,2 @@
-<!-- deployed to aws elastic beanstalk with AWS CodePipeline CI/CD for dev -->
+<!-- deployed to heroku/mongodb atlas for dev -->
 <!-- will probably do the same for prod -->
