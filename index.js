@@ -48,6 +48,8 @@ server.use(bodyParser.urlencoded({
     extended: true
 }));
 server.use(cookieParser());
+
+// TODO: this should change depending on env!
 server.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 server.use(function(req, res, next) {
