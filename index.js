@@ -70,4 +70,9 @@ server.use("/s3", s3Routes);
 server.use("/stripe", stripeRoutes);
 
 // sanity route
-server.get("/", (req, res) => res.send({ msg: env, "process.env.DEV": process.env.DEV ? 'exists' : 'doesnt exist', "process.env.PROD": process.env.PROD, origin: env.origin }));
+server.get("/", (req, res) => res.send({ 
+    msg: "connected", 
+    "process.env.DEV": process.env.DEV ? 'exists' : 'doesnt exist', 
+    "process.env.PROD": process.env.PROD ? 'exists' : 'doesnt exist', 
+    origin: env.origin ? env.origin : 'doesnt exist' 
+}));

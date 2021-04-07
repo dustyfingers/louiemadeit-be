@@ -11,7 +11,7 @@ if (process.env.LOCAL_DEV) {
 }
 // note: provess.ENV.DEV and PROD are string values so triple equals will fail equality checks
 else if (process.env.DEV) origin = "https://dev.louiemadeit.com/";
-else if (process.env.PROD == true) origin = "https://www.louiemadeit.com/";
+else if (process.env.PROD) origin = "https://www.louiemadeit.com/";
 
 module.exports = {
     bucketRegion: process.env.BUCKET_REGION || "us-east-2",
