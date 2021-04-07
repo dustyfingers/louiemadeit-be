@@ -62,12 +62,8 @@ server.use(function(req, res, next) {
 
 // determine port and environment and start server
 const PORT = process.env.PORT || 5000;
-const ENVIRONMENT = server.get('env');
 
-server.listen(PORT, () => {
-    console.log(`ENVIRONMENT: ${ENVIRONMENT}`);
-    console.log(`SERVER STARTED ON PORT: ${PORT}`);
-});
+server.listen(PORT, () => console.log(`SERVER STARTED ON PORT: ${PORT}`));
 
 // * ROUTES *
 server.use("/auth", authRoutes);
@@ -81,6 +77,6 @@ server.get("/", (req, res) => {
     // // ! important
     req.session.isAuth = true;
     // console.log(req.session);
-    res.send({ msg: "INDEX" });
+    res.send({ msg: env });
 }
 );
