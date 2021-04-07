@@ -8,7 +8,8 @@ if (process.env.LOCAL_DEV) {
     localDbPath = "mongodb://localhost/beat-store-db";
     localStripeApiKey = "sk_test_51Iay6NLYNexBDWiNT5pyxAFU0fepSkd8Mt8cdgXycHDZENhuJxbc8s3O2H9ZF6bTYWDtR7WvEqM54B8QULj9Varb00rMrMax9Y";
     console.log('running in a local environment!')
-} 
+}
+// note: provess.ENV.DEV and PROD are string values so triple equals will fail equality checks
 else if (process.env.DEV == true) origin = "https://dev.louiemadeit.com/";
 else if (process.env.PROD == true) origin = "https://www.louiemadeit.com/";
 
