@@ -32,6 +32,7 @@ const authRoutes = require("./api/routes/auth/auth");
 const userRoutes = require("./api/routes/user/user");
 const trackRoutes = require("./api/routes/track/track");
 const s3Routes = require("./api/routes/s3/s3");
+const stripeRoutes = require("./api/routes/stripe/checkout");
 
 // create express server
 const server = express();
@@ -76,6 +77,7 @@ server.use("/auth", authRoutes);
 server.use("/user", userRoutes);
 server.use("/track", trackRoutes);
 server.use("/s3", s3Routes);
+server.use("/stripe", stripeRoutes);
 
 // sanity route
 server.get("/", (req, res) => {
