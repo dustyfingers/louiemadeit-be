@@ -10,7 +10,7 @@ if (process.env.LOCAL_DEV) {
     console.log('running in a local environment!')
 }
 // note: provess.ENV.DEV and PROD are string values so triple equals will fail equality checks
-else if (process.env.DEV == true) origin = "https://dev.louiemadeit.com/";
+else if (process.env.DEV) origin = "https://dev.louiemadeit.com/";
 else if (process.env.PROD == true) origin = "https://www.louiemadeit.com/";
 
 module.exports = {
