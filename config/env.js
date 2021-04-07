@@ -1,15 +1,16 @@
 // stripe api key, db path
-let env = false, localDbPath, localStripeApiKey;
+let localDbPath, localStripeApiKey, origin;
 
-if (!process.env.HEROKU) env = 'local';
+if (!process.env.DEV && !process.env.PROD) process.env.LOCAL_DEV = true;
 
-// assign dbpath and stripe api key if in local
-// all other env variables are handled by heroku directly!!!!
-if (env) {
+if (process.env.LOCAL_DEV) {
+    origin = "http://localhost:3000";
     localDbPath = "mongodb://localhost/beat-store-db";
     localStripeApiKey = "sk_test_51Iay6NLYNexBDWiNT5pyxAFU0fepSkd8Mt8cdgXycHDZENhuJxbc8s3O2H9ZF6bTYWDtR7WvEqM54B8QULj9Varb00rMrMax9Y";
     console.log('running in a local environment!')
-}
+} 
+else if (process.env.DEV === true) origin = "https://dev.louiemadeit.com/";
+else if (process.env.PROD === true) origin = "https://www.louiemadeit.com/";
 
 module.exports = {
     bucketRegion: process.env.BUCKET_REGION || "us-east-2",
@@ -19,5 +20,6 @@ module.exports = {
     jwtSecret: process.env.JWT_SECRET || "long_random_stringfdASDFI=0QAWET982=RT09324FWASDNA;KCNaz",
     bucketName: process.env.BUCKET_NAME || "beetz",
     sessionSecret: process.env.SESSION_SECRET || "local(development>session-cookie_signing_keysfdjgbaolrt4",
-    dbPath: process.env.DB_PATH || localDbPath
+    dbPath: process.env.DB_PATH || localDbPath,
+    origin
 };

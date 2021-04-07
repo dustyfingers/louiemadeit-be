@@ -46,10 +46,7 @@ server.use(bodyParser.urlencoded({
     extended: true
 }));
 server.use(cookieParser());
-
-// TODO: this should change depending on env!
-server.use(cors({ origin: "http://localhost:3000", credentials: true }));
-
+server.use(cors({ origin: env.origin, credentials: true }));
 server.use(function(req, res, next) {
     res.header('Content-Type', 'application/json;charset=UTF-8')
     res.header('Access-Control-Allow-Credentials', true)
@@ -73,10 +70,4 @@ server.use("/s3", s3Routes);
 server.use("/stripe", stripeRoutes);
 
 // sanity route
-server.get("/", (req, res) => {
-    // // ! important
-    req.session.isAuth = true;
-    // console.log(req.session);
-    res.send({ msg: env });
-}
-);
+server.get("/", (req, res) => res.send({ msg: env }));
