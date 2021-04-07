@@ -3,9 +3,7 @@ const bcryptjs = require("bcryptjs"),
     jwt = require("jsonwebtoken");
 
 // import secrets, etc
-const {
-    jwtSecret
-} = require("../config/secrets");
+const { jwtSecret } = require("../config/env");
 
 module.exports = {
     saltAndHashPw: pw => {

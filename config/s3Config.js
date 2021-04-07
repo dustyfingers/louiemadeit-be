@@ -3,7 +3,7 @@ const {
     bucketRegion,
     awsAccessKeyId,
     awsAccessKey
-} = require("../config/secrets");
+} = require("../config/env");
 const AWS = require('aws-sdk'); // Requiring AWS SDK.
 
 // Configuring AWS

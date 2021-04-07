@@ -8,22 +8,19 @@ const express = require("express"),
     MongoDBSession = require("connect-mongodb-session")(session);
 
 // import config files
-const {
-    dbPath,
-    dbOpts
-} = require("./config/db");
-const secrets = require("./config/secrets");
+const dbOpts= require("./config/db");
+const env = require("./config/env");
 
 console.log('server started!')
 
 // connect to db
-mongoose.connect(dbPath, dbOpts);
+mongoose.connect(env.dbPath, dbOpts);
 
 console.log('db connection happens!')
 
 // create session store
 const store = MongoDBSession({
-    uri: dbPath,
+    uri: env.dbPath,
     collection: 'sessions'
 });
 
@@ -40,7 +37,7 @@ const server = express();
 // configure middlewares
 server.use(express.json());
 server.use(session({
-    secret: secrets.sessionSecret,
+    secret: env.sessionSecret,
     resave: false,
     saveUninitialized: false,
     store

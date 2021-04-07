@@ -1,6 +1,6 @@
-const secrets = require('../../../config/secrets');
+const env = require('../../../config/env');
 
-const stripe = require('stripe')(secrets.stripeTest_sk);
+const { stripe } = require('../../../config/stripeConfig');
 
 const calculateOrderAmount = items => {
     // Replace this constant with a calculation of the order's amount

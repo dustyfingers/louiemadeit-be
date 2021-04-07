@@ -1,6 +1,6 @@
 const {
     bucketName
-} = require("../config/secrets");
+} = require("../config/env");
 const {
     s3
 } = require("../config/s3Config");
