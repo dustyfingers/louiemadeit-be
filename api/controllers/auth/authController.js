@@ -4,167 +4,143 @@ const User = require("../../models/User"),
     {
         checkPw,
         generateToken,
-        decodeToken,
-        REFRESH_COOKIE_NAME,
-        ACCESS_COOKIE_NAME,
-        EMAIL_COOKIE_NAME,
-        MAX_AGE_ONE_DAY,
-        MAX_AGE_THIRTY_DAYS
+        decodeToken
+
     } = require("../../../helpers/auth");
 
 module.exports = {
+    // this needs to be completely reworked. use the code on github
     signInUser: async (req, res) => {
-        // if no cookies on request
-        if (!req.session.louiemadeitRefresh && !req.session.louiemadeitAccess && !req.session.louiemadeitEmail) {
+        // TODO: what are the ways to sign in?
+        // you can sign in with a valid email and password
+        // or you can sign in with the proper tokens validated off of your requests cookie
+        // else 401
 
-            // if given an email 
-            if (req.body.email) {
-                const {
-                    email,
-                    password
-                } = req.body;
-    
-                try {
-                    // find user and handle if no user found
-                    const user = await User.findOne({ email });
-        
-                    // if user is found in the db
-                    if (user) {
-                        if (password) {
-                            // check passwords
-                            const {
-                                hash
-                            } = user;
-                            const passwordsMatch = checkPw(password, hash);
-    
-    
-    
-                            // if passwords match, grant access and refresh token cookies to client
-                            if (passwordsMatch) {
-                                const accessToken = generateToken(email, "access");
-                                const refreshToken = generateToken(email, "refresh");
-    
-                                // set session data for cookies
-                                req.session.louiemadeitRefresh = refreshToken;
-                                req.session.louiemadeitEmail = email;
-                                req.session.louiemadeitAccess = accessToken;
-                                req.session.cookie.sameSite = 'none';
-    
-                                res.status(200).send({
-                                    success: 1,
-                                    message: "Sign In Successful",
-                                    user: user.email
-                                });
-                            } else {
-                                // if passwords do not match send a fail message
-                                const responseBody = {
-                                    status: 0,
-                                    message: "There was an error logging in given your information. . Please try again using different credentials.",
-                                    err: "Invalid Credentials"
-                                };
-                                res.status(401).send(responseBody);
-                            }
-                        } else {
-                            res.status(401).send({
-                                status: 0,
-                                message: "Request unauthorized. Please log in again.",
-                                err: "No password given."
-                            });
-                        }
-                    } 
-                    // if there is no user found in the db
-                    else {
-                        const responseBody = {
-                            status: 0,
-                            message: "No user was found using your information. Please try again using different credentials.",
-                            err: "No User Found"
-                        };
-                        res.status(401).send(responseBody);
-                    }
-                } catch (err) {
-                    const responseBody = {
-                        status: 0,
-                        message: "There was an error logging in given your information. Please try again using different credentials.",
-                        err
-                    };
-                    res.status(401).send(responseBody);
-                }
-            } 
-            // if not given an email
-            // if the client is authenticating using cookies
-            else {
-                req.session.isAuth = true;
-                res.send({session: 'junk here'})
-            }
-
-        } 
-        else {
-            const { louiemadeitRefresh, louiemadeitAccess, louiemadeitEmail } = req.session;
+        // if there is an email and password on the given request
+        if (req.body.email && req.body.password) {
+            const { email, password } = req.body;
 
             try {
-                // if access token is valid 
-                // sign in user
-                let decodedAccessEmail = decodeToken(louiemadeitAccess);
-                let decodedRefreshEmail = decodeToken(louiemadeitRefresh);
+                const foundUser = await User.findOne({ email });
+                const passwordsMatch = checkPw(password, foundUser.hash);
 
-                if (decodedAccessEmail && (decodedAccessEmail === louiemadeitEmail)) {
+                if (foundUser && passwordsMatch) {
+                    const accessToken = generateToken(email, "access");
+                    const refreshToken = generateToken(email, "refresh");
+
+                    // set auth cookies
+                    req.session.louiemadeitRefresh = refreshToken;
+                    req.session.louiemadeitEmail = email;
+                    req.session.louiemadeitAccess = accessToken;
+                    req.session.cookie.sameSite = 'none';
+                    req.session.cookie.isAdmin = foundUser.isAdmin;
+
                     res.status(200).send({
                         success: 1,
                         message: "Sign In Successful",
-                        user: louiemadeitEmail
+                        user: { email: foundUser.email, isAdmin: foundUser.isAdmin }
                     });
-                } 
-
-                // if access token is invalid but refresh token is valid
-                // generate a new access token and and assign cookie
-                else if (decodedRefreshEmail && (decodedRefreshEmail === louiemadeitEmail)) {
-                    const newAccessToken = generateToken(louiemadeitEmail, "access");
+                } else {
+                    // empty out auth cookies
+                    req.session.louiemadeitRefresh = '';
+                    req.session.louiemadeitAccess = '';
+                    req.session.louiemadeitEmail = '';
+                    req.session.cookie.isAdmin = '';
                     
-                    req.session.louiemadeitAccess = newAccessToken;
-
-                    res.status(200).send({
-                        success: 1,
-                        message: "Sign In Successful",
-                        user: louiemadeitEmail
+                    res.status(401).send({
+                        status: 0,
+                        message: "There was an error logging in given your information. . Please try again using different credentials.",
+                        err: "Invalid Credentials"
                     });
-                } 
-                // if neither are valid set session tokens to empty and return an error
-                else {
-                // empty out session vars
+                }
+                
+            } catch (error) {
+                res.status(401).send({
+                    status: 0,
+                    message: "No user was found using your information. Please try again using different credentials.",
+                    err: "No User Found"
+                });
+            }
+        } 
+
+        // if auth cookies were sent with request
+        let authCookiesSet = (req.session.louiemadeitRefresh && req.session.louiemadeitAccess && req.session.louiemadeitEmail);
+
+        // TODO: if auth cookies sent on request 
+        if (authCookiesSet) {
+            const { louiemadeitRefresh, louiemadeitAccess, louiemadeitEmail, isAdmin } = req.session;
+            let decodedAccessEmail = decodeToken(louiemadeitAccess);
+            let decodedRefreshEmail = decodeToken(louiemadeitRefresh);
+
+            // ? what could happen here?
+
+            // ? 1
+            // * if access token is VALID, sign in user
+            if (decodedAccessEmail && (decodedAccessEmail === louiemadeitEmail)) {
+                res.status(200).send({
+                    success: 1,
+                    message: "Sign In Successful",
+                    user: { email: louiemadeitEmail, isAdmin }
+                });
+            }
+
+            // ? 2
+            // * if access token is INVALID but refresh token is VALID, generate a new 
+            // * access token and and assign proper auth cookie, then sign in user
+
+            else if (decodedRefreshEmail && (decodedRefreshEmail === louiemadeitEmail)) {
+                const newAccessToken = generateToken(louiemadeitEmail, "access");
+                req.session.louiemadeitAccess = newAccessToken;
+
+                res.status(200).send({
+                    success: 1,
+                    message: "Sign In Successful",
+                    user: { email: louiemadeitEmail, isAdmin }
+                });
+            } 
+
+            // ? 3
+            // * if neither access or refresh tokens are valid empty authCookies and return 401
+            else {
+                // empty out auth cookies
                 req.session.louiemadeitRefresh = '';
                 req.session.louiemadeitAccess = '';
                 req.session.louiemadeitEmail = '';
+                req.session.cookie.isAdmin = '';
 
                 res.status(401).send({
                     success: 1,
-                    message: "Tokens Invlaid. Please Sign In Again."
+                    message: "Please Sign In Again."
                 });
-                }
-
-    
-
-            } catch (err) {
-                const responseBody = {
-                    status: 0,
-                    message: "There was an error logging you in. Please try again."
-                };
-                res.status(401).send(responseBody);
             }
+        }
+        // if auth cookies are NOT sent on request
+        else {
+            // ensure nothing is in ANY of the auth cookies
+            req.session.louiemadeitRefresh = '';
+            req.session.louiemadeitAccess = '';
+            req.session.louiemadeitEmail = '';
+            req.session.cookie.isAdmin = '';
+
+            res.status(401).send({
+                success: 1,
+                message: "Please Sign In Again."
+            });
         }
     },
     signOutUser: async (req, res) => {
         // if the user is already signed out
         if (!req.session.louiemadeitRefresh && !req.session.louiemadeitAccess && !req.session.louiemadeitEmail) {
-
             res.status(200).send({
                 success: 1,
                 message: "User Already Signed Out. Redirecting..."
             });
         } else {
-            // empty out session vars
+            // empty out auth cookies
             req.session.louiemadeitRefresh = '';
             req.session.louiemadeitAccess = '';
             req.session.louiemadeitEmail = '';
+            req.session.cookie.isAdmin = '';
             res.status(200).send({
                 success: 1,
                 message: "Sign Out Successful"
