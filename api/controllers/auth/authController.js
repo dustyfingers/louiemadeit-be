@@ -9,12 +9,14 @@ const User = require("../../models/User"),
     } = require("../../../helpers/auth");
 
 module.exports = {
-    // this needs to be completely reworked. use the code on github
     signInUser: async (req, res) => {
-        // TODO: what are the ways to sign in?
+        // TODO: client (when browser) not getting cookies!
+        // client (when insomina) works fine!
         // you can sign in with a valid email and password
         // or you can sign in with the proper tokens validated off of your requests cookie
-        // else 401
+        // else ensure every auth cookie is empty and 401
+
+        let authCookiesSet = (req.session.louiemadeitRefresh && req.session.louiemadeitAccess && req.session.louiemadeitEmail);
 
         // if there is an email and password on the given request
         if (req.body.email && req.body.password) {
@@ -32,7 +34,7 @@ module.exports = {
                     req.session.louiemadeitRefresh = refreshToken;
                     req.session.louiemadeitEmail = email;
                     req.session.louiemadeitAccess = accessToken;
-                    req.session.cookie.sameSite = 'none';
+                    req.session.cookie.sameSite = 'false';
                     req.session.cookie.isAdmin = foundUser.isAdmin;
 
                     res.status(200).send({
@@ -46,7 +48,7 @@ module.exports = {
                     req.session.louiemadeitAccess = '';
                     req.session.louiemadeitEmail = '';
                     req.session.cookie.isAdmin = '';
-                    
+
                     res.status(401).send({
                         status: 0,
                         message: "There was an error logging in given your information. . Please try again using different credentials.",
@@ -61,16 +63,12 @@ module.exports = {
                     err: "No User Found"
                 });
             }
-        } 
-
-        // if auth cookies were sent with request
-        let authCookiesSet = (req.session.louiemadeitRefresh && req.session.louiemadeitAccess && req.session.louiemadeitEmail);
-
-        // TODO: if auth cookies sent on request 
-        if (authCookiesSet) {
+            
+        } else if (authCookiesSet) {
             const { louiemadeitRefresh, louiemadeitAccess, louiemadeitEmail, isAdmin } = req.session;
             let decodedAccessEmail = decodeToken(louiemadeitAccess);
             let decodedRefreshEmail = decodeToken(louiemadeitRefresh);
+            const foundUser = await User.findOne({ email: louiemadeitEmail });
 
             // ? what could happen here?
 
@@ -80,7 +78,7 @@ module.exports = {
                 res.status(200).send({
                     success: 1,
                     message: "Sign In Successful",
-                    user: { email: louiemadeitEmail, isAdmin }
+                    user: { email: louiemadeitEmail, isAdmin: foundUser.isAdmin }
                 });
             }
 
@@ -95,7 +93,7 @@ module.exports = {
                 res.status(200).send({
                     success: 1,
                     message: "Sign In Successful",
-                    user: { email: louiemadeitEmail, isAdmin }
+                    user: { email: louiemadeitEmail, isAdmin: foundUser.isAdmin }
                 });
             } 
 
@@ -114,7 +112,7 @@ module.exports = {
                 });
             }
         }
-        // if auth cookies are NOT sent on request
+        // if neither auth cookies or email and pw are sent on request
         else {
             // ensure nothing is in ANY of the auth cookies
             req.session.louiemadeitRefresh = '';
