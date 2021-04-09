@@ -34,12 +34,12 @@ module.exports = {
                     req.session.louiemadeitRefresh = refreshToken;
                     req.session.louiemadeitEmail = email;
                     req.session.louiemadeitAccess = accessToken;
-                    req.session.cookie.sameSite = 'false';
-                    req.session.cookie.isAdmin = foundUser.isAdmin;
+                    req.session.cookie.sameSite = 'none';
+                    req.session.isAdmin = foundUser.isAdmin;
 
                     res.status(200).send({
                         success: 1,
-                        message: "Sign In Successful",
+                        message: "Email Sign In Successful",
                         user: { email: foundUser.email, isAdmin: foundUser.isAdmin }
                     });
                 } else {
@@ -47,7 +47,7 @@ module.exports = {
                     req.session.louiemadeitRefresh = '';
                     req.session.louiemadeitAccess = '';
                     req.session.louiemadeitEmail = '';
-                    req.session.cookie.isAdmin = '';
+                    req.session.isAdmin = '';
 
                     res.status(401).send({
                         status: 0,
@@ -65,7 +65,7 @@ module.exports = {
             }
             
         } else if (authCookiesSet) {
-            const { louiemadeitRefresh, louiemadeitAccess, louiemadeitEmail, isAdmin } = req.session;
+            const { louiemadeitRefresh, louiemadeitAccess, louiemadeitEmail } = req.session;
             let decodedAccessEmail = decodeToken(louiemadeitAccess);
             let decodedRefreshEmail = decodeToken(louiemadeitRefresh);
             const foundUser = await User.findOne({ email: louiemadeitEmail });
@@ -75,9 +75,10 @@ module.exports = {
             // ? 1
             // * if access token is VALID, sign in user
             if (decodedAccessEmail && (decodedAccessEmail === louiemadeitEmail)) {
+                console.log('access sign in attempted')
                 res.status(200).send({
                     success: 1,
-                    message: "Sign In Successful",
+                    message: "Access Sign In Successful",
                     user: { email: louiemadeitEmail, isAdmin: foundUser.isAdmin }
                 });
             }
@@ -85,14 +86,14 @@ module.exports = {
             // ? 2
             // * if access token is INVALID but refresh token is VALID, generate a new 
             // * access token and and assign proper auth cookie, then sign in user
-
             else if (decodedRefreshEmail && (decodedRefreshEmail === louiemadeitEmail)) {
+                console.log('refresh sign in attempted')
                 const newAccessToken = generateToken(louiemadeitEmail, "access");
                 req.session.louiemadeitAccess = newAccessToken;
 
                 res.status(200).send({
                     success: 1,
-                    message: "Sign In Successful",
+                    message: "Refresh Sign In Successful",
                     user: { email: louiemadeitEmail, isAdmin: foundUser.isAdmin }
                 });
             } 
@@ -100,11 +101,12 @@ module.exports = {
             // ? 3
             // * if neither access or refresh tokens are valid empty authCookies and return 401
             else {
+                console.log('auth cookies not set')
                 // empty out auth cookies
                 req.session.louiemadeitRefresh = '';
                 req.session.louiemadeitAccess = '';
                 req.session.louiemadeitEmail = '';
-                req.session.cookie.isAdmin = '';
+                req.session.isAdmin = '';
 
                 res.status(401).send({
                     success: 1,
@@ -114,11 +116,12 @@ module.exports = {
         }
         // if neither auth cookies or email and pw are sent on request
         else {
-            // ensure nothing is in ANY of the auth cookies
+            console.log('NEITHER auth cookies or email and password sent');
+            // empty out auth cookies
             req.session.louiemadeitRefresh = '';
             req.session.louiemadeitAccess = '';
             req.session.louiemadeitEmail = '';
-            req.session.cookie.isAdmin = '';
+            req.session.isAdmin = '';
 
             res.status(401).send({
                 success: 1,
@@ -138,7 +141,7 @@ module.exports = {
             req.session.louiemadeitRefresh = '';
             req.session.louiemadeitAccess = '';
             req.session.louiemadeitEmail = '';
-            req.session.cookie.isAdmin = '';
+            req.session.isAdmin = '';
             res.status(200).send({
                 success: 1,
                 message: "Sign Out Successful"
