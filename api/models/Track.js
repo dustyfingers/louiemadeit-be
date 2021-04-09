@@ -10,6 +10,10 @@ let Track = new Schema({
         type: String,
         required: true
     },
+    taggedVersionUrl: {
+        type: String,
+        default: ''
+    },
     untaggedVersion: {
         type: String,
         required: true
@@ -17,6 +21,10 @@ let Track = new Schema({
     stems: {
         type: String,
         required: true
+    },
+    coverArtUrl: {
+        type: String,
+        default: ''
     },
     coverArt: {
         type: String,

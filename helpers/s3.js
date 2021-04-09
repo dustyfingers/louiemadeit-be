@@ -13,9 +13,7 @@ const {
 const generateUrlHelper = (type, opts) => {
     return new Promise((resolve, reject) => {
         if (type === "get") {
-            const {
-                Key
-            } = opts;
+            const { Key } = opts;
             const params = {
                 Bucket: bucketName,
                 Key,

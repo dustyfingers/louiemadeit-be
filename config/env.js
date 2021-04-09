@@ -1,15 +1,11 @@
 // stripe api key, db path
 let localDbPath, localStripeApiKey, origin;
 
-if (!process.env.DEV && !process.env.PROD) process.env.LOCAL_DEV = true;
-
-if (process.env.LOCAL_DEV) {
+if (!process.env.DEV && !process.env.PROD) {
     origin = "http://localhost:3000";
     localDbPath = "mongodb://localhost/beat-store-db";
     localStripeApiKey = "sk_test_51Iay6NLYNexBDWiNT5pyxAFU0fepSkd8Mt8cdgXycHDZENhuJxbc8s3O2H9ZF6bTYWDtR7WvEqM54B8QULj9Varb00rMrMax9Y";
-    console.log('running in a local environment!')
 }
-// note: provess.ENV.DEV and PROD are string values so triple equals will fail equality checks
 else if (process.env.DEV) origin = "https://dev.louiemadeit.com";
 else if (process.env.PROD) origin = "https://www.louiemadeit.com";
 
