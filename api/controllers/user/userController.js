@@ -23,7 +23,6 @@ module.exports = {
         try {
             // salt and hash pw
             const hash = saltAndHashPw(password);
-            let userCreated;
 
             // create a user in db
             if (isAdmin) {
@@ -48,7 +47,7 @@ module.exports = {
             req.session.louiemadeitEmail = email;
             req.session.louiemadeitAccess = accessToken;
 
-            console.log(req.session.cookie);
+            console.log(req.session);
 
             // send response
             res.status(200).send({

@@ -6,6 +6,10 @@ let Track = new Schema({
         type: String,
         required: true
     },
+    stripeProduct: {
+        type: String,
+        required: true
+    },
     taggedVersion: {
         type: String,
         required: true

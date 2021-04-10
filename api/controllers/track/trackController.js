@@ -2,11 +2,40 @@
 const Track = require("../../models/Track");
 
 const { generateUrlHelper } = require("../../../helpers/s3");
+const { stripe } = require("../../../config/stripeConfig");
 
 module.exports = {
     createTrack: async (req, res) => {
         try {
-            const track = await Track.create(req.body);
+            const stripeTrack = await stripe.products.create({ name: req.body.trackName });
+
+            await stripe.prices.create({
+                product: stripeTrack.id,
+                currency: "usd",
+                unit_amount: 2999,
+                metadata: {
+                    name: 'lease'
+                }
+            });
+            await stripe.prices.create({
+                product: stripeTrack.id,
+                currency: "usd",
+                unit_amount: 4999,
+                metadata: {
+                    name: 'master'
+                }
+            });
+
+            await stripe.prices.create({
+                product: stripeTrack.id,
+                currency: "usd",
+                unit_amount: 4999,
+                metadata: {
+                    name: 'exclusive'
+                }
+            });
+
+            const track = await Track.create({ ...req.body, stripeProduct: stripeTrack.id });
 
             res.status(200).send({
                 status: 1,
@@ -47,6 +76,5 @@ module.exports = {
             };
             res.status(400).send(responseBody);
         }
-    },
-    fetchSingleTrack: async (req, res) => {}
+    }
 };
