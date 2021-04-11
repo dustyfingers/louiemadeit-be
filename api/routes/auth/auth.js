@@ -56,7 +56,13 @@ router.get("/current-user", (req, res) => {
 });
 
 // user sign out route
-router.post("/sign-out", (req, res) => req.logOut());
+router.post("/sign-out", (req, res) => {
+    req.logOut();
+    res.status(200).send({
+        status: 1,
+        message: "User Logged Out"
+    });
+});
 
 // TODO: user forgot password
 
