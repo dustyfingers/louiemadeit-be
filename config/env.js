@@ -10,10 +10,12 @@ if (!process.env.DEV && !process.env.PROD) {
 else if (process.env.DEV) {
     origin = "https://dev.louiemadeit.com";
     sameSite = "none";
+    secure = true;
 }
 else if (process.env.PROD) {
     origin = "https://www.louiemadeit.com";
     sameSite = "none";
+    secure = true;
 }
 
 module.exports = {
