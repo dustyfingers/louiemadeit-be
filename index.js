@@ -40,6 +40,7 @@ server.use(session({
         maxAge: 86400,
         // sameSite: 'none' breaks this in dev
         // but the test env seems to whine about it
+        sameSite: env.sameSite,
         httpOnly: true
     },
     store

@@ -1,13 +1,20 @@
 // stripe api key, db path
-let localDbPath, localStripeApiKey, origin;
+let localDbPath, localStripeApiKey, origin, sameSite;
 
 if (!process.env.DEV && !process.env.PROD) {
     origin = "http://localhost:3000";
     localDbPath = "mongodb://localhost/beat-store-db";
     localStripeApiKey = "sk_test_51Iay6NLYNexBDWiNT5pyxAFU0fepSkd8Mt8cdgXycHDZENhuJxbc8s3O2H9ZF6bTYWDtR7WvEqM54B8QULj9Varb00rMrMax9Y";
+    sameSite = "lax"
 }
-else if (process.env.DEV) origin = "https://dev.louiemadeit.com";
-else if (process.env.PROD) origin = "https://www.louiemadeit.com";
+else if (process.env.DEV) {
+    origin = "https://dev.louiemadeit.com";
+    sameSite = "none";
+}
+else if (process.env.PROD) {
+    origin = "https://www.louiemadeit.com";
+    sameSite = "none";
+}
 
 module.exports = {
     bucketRegion: process.env.BUCKET_REGION || "us-east-2",
@@ -18,5 +25,6 @@ module.exports = {
     bucketName: process.env.BUCKET_NAME || "beetz",
     sessionSecret: process.env.SESSION_SECRET || "local(development>session-cookie_signing_keysfdjgbaolrt4",
     dbPath: process.env.DB_PATH || localDbPath,
-    origin
+    origin,
+    sameSite
 };
