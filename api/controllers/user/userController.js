@@ -1,14 +1,6 @@
 // import user model, auth helpers, middleware
 const User = require("../../models/User"),
-    {
-        saltAndHashPw,
-        generateToken,
-        ACCESS_COOKIE_NAME,
-        REFRESH_COOKIE_NAME,
-        EMAIL_COOKIE_NAME,
-        MAX_AGE_ONE_DAY,
-        MAX_AGE_THIRTY_DAYS
-    } = require("../../../helpers/auth");
+    { saltAndHashPw } = require("../../../helpers/auth");
 
 module.exports = {
     createUser: async (req, res) => {
@@ -55,7 +47,7 @@ module.exports = {
     },
     fetchUser: async (req, res) => {
         // TODO: fetch user from db here
-        console.log('fetch user called!');
+        console.log(req.user);
         res.send(req.user);
     }
 };
