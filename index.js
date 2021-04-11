@@ -38,9 +38,8 @@ server.use(session({
     saveUninitialized: true,
     cookie: {
         maxAge: 86400,
-        // sameSite: 'none' breaks this in dev
-        // but the test env seems to whine about it
         sameSite: env.sameSite,
+        secure: env.secure,
         httpOnly: true
     },
     store
