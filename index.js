@@ -9,8 +9,8 @@ const express = require("express"),
     MongoDBSession = require("connect-mongodb-session")(session);
 
 // import config files
-const dbOpts= require("./config/db");
-const env = require("./config/env");
+const dbOpts= require("./config/db"),
+    env = require("./config/env");
 
 // connect to db & create session store
 mongoose.connect(env.dbPath, dbOpts);
@@ -29,14 +29,8 @@ const stripeRoutes = require("./api/routes/stripe/checkout");
 // create express server & config middleware
 const server = express();
 server.use(express.json());
-server.use(cookieParser());
+server.use(cookieParser(env.sessionSecret));
 server.use(bodyParser.urlencoded({ extended: true }));
-server.use(session({
-    secret: env.sessionSecret,
-    resave: false,
-    saveUninitialized: false,
-    store
-}));
 server.use(cors({ origin: env.origin, credentials: true }));
 server.use(function(req, res, next) {
     res.header('Content-Type', 'application/json;charset=UTF-8')
@@ -47,8 +41,17 @@ server.use(function(req, res, next) {
     )
     next()
 });
+server.use(session({
+    secret: env.sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    store
+}));
+
+// passport setup
 server.use(passport.initialize());
 server.use(passport.session());
+require("./config/passportConfig")(passport);
 
 // determine port and environment and start server
 const PORT = process.env.PORT || 5000;

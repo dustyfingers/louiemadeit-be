@@ -38,21 +38,11 @@ module.exports = {
                 });
             }
 
-            // generate tokens and send response
-            const refreshToken = generateToken(email, "refresh");
-            const accessToken = generateToken(email, "access");
-            
-            // set session data for cookies
-            req.session.louiemadeitRefresh = refreshToken;
-            req.session.louiemadeitEmail = email;
-            req.session.louiemadeitAccess = accessToken;
-
-            console.log(req.session);
-
             // send response
             res.status(200).send({
                 success: 1,
-                message: "User created successfully"
+                message: "User created successfully",
+                user: userCreated
             });
         } catch (err) {
             const responseBody = {
@@ -62,5 +52,10 @@ module.exports = {
             };
             res.status(400).send(responseBody);
         }
+    },
+    fetchUser: async (req, res) => {
+        // TODO: fetch user from db here
+        console.log('fetch user called!');
+        res.send(req.user);
     }
 };
