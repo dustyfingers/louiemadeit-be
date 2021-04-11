@@ -1,6 +1,9 @@
 // import libs/other
 const express = require("express");
 const passport = require("passport");
+const bcrypt = require("bcryptjs");
+
+const User = require("../../models/User");
 
 // init router
 const router = express.Router();
