@@ -1,17 +1,22 @@
 // import libs/other
 const express = require("express");
+const passport = require("passport");
 
-// import controller
-const authController = require("../../controllers/auth/authController");
+const User = require("../../models/User");
 
 // init router
 const router = express.Router();
 
-// user sign in
-router.post("/sign-in", (req, res) => authController.signInUser(req, res));
+// passport setup
+require('../../../passport');
 
-// user sign out
-router.post("/sign-out", (req, res) => authController.signOutUser(req, res));
+// user sign in route
+router.post("/sign-in", (req, res, next) => {
+    passport.authenticate('local')(req, res, next);
+});
+
+// user sign out route
+router.post("/sign-out", (req, res) => req.logout());
 
 // TODO: user forgot password
 

@@ -3,6 +3,7 @@ const express = require("express"),
     bodyParser = require("body-parser"),
     mongoose = require("mongoose"),
     cookieParser = require("cookie-parser"),
+    passport = require("passport"),
     cors = require("cors"),
     session = require("express-session"),
     MongoDBSession = require("connect-mongodb-session")(session);
@@ -11,14 +12,8 @@ const express = require("express"),
 const dbOpts= require("./config/db");
 const env = require("./config/env");
 
-console.log('server started!')
-
-// connect to db
+// connect to db & create session store
 mongoose.connect(env.dbPath, dbOpts);
-
-console.log('db connection happens!')
-
-// create session store
 const store = MongoDBSession({
     uri: env.dbPath,
     collection: 'sessions'
@@ -31,21 +26,17 @@ const trackRoutes = require("./api/routes/track/track");
 const s3Routes = require("./api/routes/s3/s3");
 const stripeRoutes = require("./api/routes/stripe/checkout");
 
-// create express server
+// create express server & config middleware
 const server = express();
-
-// configure middlewares
 server.use(express.json());
+server.use(cookieParser());
+server.use(bodyParser.urlencoded({ extended: true }));
 server.use(session({
     secret: env.sessionSecret,
     resave: false,
     saveUninitialized: false,
     store
 }));
-server.use(bodyParser.urlencoded({
-    extended: true
-}));
-server.use(cookieParser());
 server.use(cors({ origin: env.origin, credentials: true }));
 server.use(function(req, res, next) {
     res.header('Content-Type', 'application/json;charset=UTF-8')
@@ -55,7 +46,9 @@ server.use(function(req, res, next) {
         'Origin, X-Requested-With, Content-Type, Accept'
     )
     next()
-})
+});
+server.use(passport.initialize());
+server.use(passport.session());
 
 // determine port and environment and start server
 const PORT = process.env.PORT || 5000;
@@ -68,6 +61,3 @@ server.use("/user", userRoutes);
 server.use("/track", trackRoutes);
 server.use("/s3", s3Routes);
 server.use("/stripe", stripeRoutes);
-
-// sanity route
-server.get("/", (req, res) => res.send({ msg: "connected" }));

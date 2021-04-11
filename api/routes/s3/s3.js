@@ -8,7 +8,6 @@ const router = express.Router();
 
 // import controllers, middlewares
 const s3Controller = require("../../controllers/s3/s3Controller");
-const { authorizeUser } = require("../../../middleware/auth");
 
 // generate put s3 url
 router.get("/generate-put-url", (req, res) => s3Controller.generatePutUrl(req, res));
