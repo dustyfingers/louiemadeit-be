@@ -53,28 +53,35 @@ module.exports = {
     },
     fetchAllCurrentTracks: async (req, res) => {
         try {
-            const tracks = await Track.find();
+            const tracks = await Track.find({ hasBeenSoldAsExclusive: false }).exec();
 
-            // for each track generate the proper track and cover art get urls and attach it to the track object
-            for (let i = 0; i < tracks.length; i++) {
-                let taggedVersion = tracks[i].taggedVersion;
-                let coverArt = tracks[i].coverArt;
-                tracks[i].taggedVersionUrl = false || await generateUrlHelper('get', { Key: taggedVersion});
-                tracks[i].coverArtUrl = false || await generateUrlHelper('get', { Key: coverArt });
+            if (tracks.length !== 0) {
+                // for each track generate the proper track and cover art get urls and attach it to the track object
+                for (let i = 0; i < tracks.length; i++) {
+                    let taggedVersion = tracks[i].taggedVersion;
+                    let coverArt = tracks[i].coverArt;
+                    tracks[i].taggedVersionUrl = false || await generateUrlHelper('get', { Key: taggedVersion});
+                    tracks[i].coverArtUrl = false || await generateUrlHelper('get', { Key: coverArt });
+                }
+
+                res.status(200).send({
+                    status: 1,
+                    message: "Here are the tracks for the shop!",
+                    tracks
+                });
+            } else {
+                res.status(200).send({
+                    status: 1,
+                    message: "There are no shop tracks currently."
+                });
             }
 
-            res.status(200).send({
-                status: 1,
-                message: "Here are the tracks for the shop!",
-                tracks
-            });
         } catch (err) {
-            const responseBody = {
+            res.status(400).send({
                 status: 0,
                 message: "There was an error fetching the tracks for the shop.",
                 err
-            };
-            res.status(400).send(responseBody);
+            });
         }
     }
 };
