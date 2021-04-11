@@ -7,7 +7,6 @@ const router = express.Router();
 
 // user sign in route
 router.post("/sign-in", (req, res, next) => {
-    console.log(req.body);
     passport.authenticate('local', (error, user, info) => {
         if (error) {
             res.status(401).send({
@@ -40,7 +39,7 @@ router.post("/sign-in", (req, res, next) => {
 });
 
 // user sign out route
-router.post("/sign-out", (req, res) => req.logout());
+router.post("/sign-out", (req, res) => req.logOut());
 
 // TODO: user forgot password
 

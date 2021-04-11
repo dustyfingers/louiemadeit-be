@@ -8,7 +8,6 @@ module.exports = passport => {
         try {
             User.findOne({ email }, (err, user) => {
                 if (err) return done(err);
-        
                 if (!user) return done(null, false, {
                     status: 0,
                     message: "There was an error logging in given your email. Please try again using different credentials.",
@@ -31,7 +30,7 @@ module.exports = passport => {
             res.status(400).send({success: 0, message: 'No user found.', error})
         }
     }));
-    passport.serializeUser((user, done) => done(null, user._id));
-    passport.deserializeUser((id, done) => User.findById(id, (err, user) => done(err, user)));
+    passport.serializeUser((user, done) => done(null, user.id));
+    passport.deserializeUser((id, done) => User.findOne({ "_id": id }, (err, user) => done(err, user)));
 };
 
