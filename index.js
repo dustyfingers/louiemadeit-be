@@ -6,14 +6,11 @@ const express = require("express"),
     passport = require("passport"),
     cors = require("cors"),
     session = require("express-session"),
-    bcrypt = require("bcryptjs"),
     MongoDBSession = require("connect-mongodb-session")(session);
 
 // import config files
 const dbOpts= require("./config/db"),
     env = require("./config/env");
-
-const User = require("./api/models/User");
 
 // connect to db & create session store
 mongoose.connect(env.dbPath, dbOpts);
@@ -33,6 +30,7 @@ const stripeRoutes = require("./api/routes/stripe/checkout");
 const server = express();
 server.use(express.json());
 server.use(bodyParser.urlencoded({ extended: true }));
+server.use(cookieParser());
 server.use(cors({ origin: env.origin, credentials: true }));
 server.use(session({
     secret: env.sessionSecret,
@@ -40,6 +38,8 @@ server.use(session({
     saveUninitialized: true,
     cookie: {
         maxAge: 86400,
+        // sameSite: 'none' breaks this in dev
+        // but the test env seems to whine about it
         httpOnly: true
     },
     store
