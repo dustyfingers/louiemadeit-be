@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 // import libs/other
 const express = require("express"),
     bodyParser = require("body-parser"),
@@ -11,6 +13,12 @@ const express = require("express"),
 // import config files
 const dbOpts= require("./config/db"),
     env = require("./config/env");
+// import routes
+const authRoutes = require("./api/routes/auth/auth"),
+    userRoutes = require("./api/routes/user/user"),
+    trackRoutes = require("./api/routes/track/track"),
+    s3Routes = require("./api/routes/s3/s3"),
+    stripeRoutes = require("./api/routes/stripe/checkout");
 
 // connect to db & create session store
 mongoose.connect(env.dbPath, dbOpts);
@@ -18,13 +26,6 @@ const store = MongoDBSession({
     uri: env.dbPath,
     collection: 'sessions'
 });
-
-// import routes
-const authRoutes = require("./api/routes/auth/auth");
-const userRoutes = require("./api/routes/user/user");
-const trackRoutes = require("./api/routes/track/track");
-const s3Routes = require("./api/routes/s3/s3");
-const stripeRoutes = require("./api/routes/stripe/checkout");
 
 // create express server & config middleware
 const server = express();
