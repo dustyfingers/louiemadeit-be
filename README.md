@@ -1,7 +1,7 @@
 <!-- deployed to heroku/mongodb atlas for dev -->
 <!-- will probably do the same for prod -->
 
-setup prerequisites:
+local setup prerequisites:
 nodejs/npm
 mongodb
 
@@ -27,4 +27,5 @@ npm run dev
 step 4:
 ???
 
-step 5: profit
+step 5:
+profit

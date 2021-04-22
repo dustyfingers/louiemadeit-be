@@ -11,8 +11,9 @@ const express = require("express"),
     MongoDBSession = require("connect-mongodb-session")(session);
 
 // import config files
-const dbOpts= require("./config/db"),
+const dbOpts = require("./config/db"),
     env = require("./config/env");
+
 // import routes
 const authRoutes = require("./api/routes/auth/auth"),
     userRoutes = require("./api/routes/user/user"),

@@ -59,13 +59,25 @@ let Track = new Schema({
             type: Number,
             default: 149.99
         },
+        exclusiveStripePrice: {
+            type: String,
+            required: true
+        },
         leasePriceMaster: {
             type: Number,
             default: 29.99
         },
+        leaseStripePriceMaster: {
+            type: String,
+            required: true
+        },
         leasePriceStems: {
             type: Number,
             default: 49.99
+        },
+        leaseStripePriceStems: {
+            type: String,
+            required: true
         },
     },
     createdAt: {
