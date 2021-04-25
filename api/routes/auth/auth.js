@@ -51,7 +51,6 @@ router.post("/sign-up", (req, res) => {
 
 // fetch current user
 router.get("/current-user", (req, res) => {
-    console.log(req.sessionID);
     res.send({ user: req.user }); // The req.user stores the entire user that has been authenticated inside of it.
 });
 

@@ -73,8 +73,6 @@ module.exports = {
                     tracks[i].coverArtUrl = false || await generateUrlHelper('get', { Key: coverArt });
                 }
 
-                console.log(tracks);
-
                 res.status(200).send({
                     status: 1,
                     message: "Here are the tracks for the shop!",
