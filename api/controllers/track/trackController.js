@@ -92,5 +92,8 @@ module.exports = {
                 err
             });
         }
+    },
+    purchaseCart: async () => {
+        // handle items purchased here?
     }
 };

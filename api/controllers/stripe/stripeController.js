@@ -1,26 +1,18 @@
 const env = require('../../../config/env');
 
 const { stripe } = require('../../../config/stripeConfig');
-
-const calculateOrderAmount = items => {
-    // TODO: ! important!!!
-    // Replace this constant with a calculation of the order's amount
-    // Calculate the order total on the server to prevent
-    // people from directly manipulating the amount on the client
-    return 1400;
-};
+const { calculateOrderAmount } = require('../../../helpers/cart');
 
 module.exports = {
     createPaymentIntent: async (req, res) => {
         try {
             const { items } = req.body;
-            console.log(items);
 
-            // Create a PaymentIntent with the order amount and currency
             const paymentIntent = await stripe.paymentIntents.create({
-                amount: calculateOrderAmount(items),
+                amount: await calculateOrderAmount(items),
                 currency: "usd"
             });
+
             res.send({
                 clientSecret: paymentIntent.client_secret
             });

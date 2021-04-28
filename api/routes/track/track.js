@@ -11,4 +11,7 @@ router.post("/new", (req, res) => trackController.createTrack(req, res));
 // fetch all tracks (store page)
 router.get("/all", (req, res) => trackController.fetchAllCurrentTracks(req, res));
 
+// purchase items in cart
+router.post("/purchase-cart", (req, res) => trackController.purchaseCart(req, res));
+
 module.exports = router;
