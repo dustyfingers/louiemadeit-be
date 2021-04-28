@@ -1,16 +1,27 @@
 const env = require('../../../config/env');
 
 const { stripe } = require('../../../config/stripeConfig');
-const { calculateOrderAmount } = require('../../../helpers/cart');
+const { calculateOrderAmount, handlePaymentIntentSucceeded } = require('../../../helpers/cart');
+
+// to listen for test events on windows
+// ./stripe.exe listen --forward-to localhost:5000/stripe/webhooks/handle-payment-intent
 
 module.exports = {
     createPaymentIntent: async (req, res) => {
         try {
             const { items } = req.body;
+            let meta = {};
 
+            for (let i = 0; i < items.length; i++) {
+                const productID = items[i].trackID;
+                meta[productID] = items[i].priceID;
+            }
+
+            // TODO: add receipt_email to this to send a receipt to the customer
             const paymentIntent = await stripe.paymentIntents.create({
                 amount: await calculateOrderAmount(items),
-                currency: "usd"
+                currency: "usd",
+                metadata: meta
             });
 
             res.send({
@@ -23,7 +34,6 @@ module.exports = {
     handlePaymentIntent: async (req, res) => {
         try {
             const event = req.body;
-            console.log(event.type);
 
             switch (event.type) {
                 case 'payment_intent.succeeded':
@@ -31,13 +41,12 @@ module.exports = {
                     console.log(`Payment intent for ${paymentIntent.amount} was successful!`);
 
                     // TODO: mark item as sold in db here
-                    // handlePaymentIntentSucceeded(paymentIntent);
+                    handlePaymentIntentSucceeded(paymentIntent);
 
                     response.status(200).send({ message: "db stuff done with items!"});
                     
                     break;
                 default:
-                    console.log(`Unknown event type ${event.type}`);
                     break;
             }
 

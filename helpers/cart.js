@@ -10,5 +10,8 @@ module.exports = {
         } 
 
         return total;
+    },
+    handlePaymentIntentSucceeded: async paymentIntent => {
+        return;
     }
 };
