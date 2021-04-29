@@ -17,6 +17,8 @@ SESSION_SECRET=
 STRIPE_SK=
 ORIGIN=http://localhost:3000
 SAME_SITE=lax
+EMAIL=
+EMAIL_PASSWORD=
 
 step 2:
 npm install in root project dir

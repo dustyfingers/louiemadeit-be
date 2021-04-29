@@ -11,19 +11,19 @@ const router = express.Router();
 // user sign in route
 router.post("/sign-in", (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
-      if (err) throw err;
-      if (!user) res.send("No User Exists");
-      else {
-        req.logIn(user, (err) => {
-          if (err) throw err;
-          res.status(200).send({
-            status: 1,
-            user,
-            message: "Successfully Authenticated",
-            cookies: req.signedCookies
-        });
-        });
-      }
+        if (err) throw err;
+        if (!user) res.send("No User Exists");
+        else {
+            req.logIn(user, (err) => {
+                if (err) throw err;
+                res.status(200).send({
+                    status: 1,
+                    user,
+                    message: "Successfully Authenticated",
+                    cookies: req.signedCookies
+                });
+            });
+        }
     })(req, res, next);
 });
 
