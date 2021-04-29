@@ -52,13 +52,11 @@ server.use(passport.initialize());
 server.use(passport.session());
 require("./config/passportConfig")(passport);
 
-// determine port and environment and start server
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`SERVER STARTED ON PORT: ${PORT}`));
-
 // * ROUTES 
 server.use("/auth", authRoutes);
 server.use("/user", userRoutes);
 server.use("/track", trackRoutes);
 server.use("/s3", s3Routes);
 server.use("/stripe", stripeRoutes);
+
+module.exports = server;
