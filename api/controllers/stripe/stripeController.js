@@ -1,9 +1,7 @@
-const nodemailer = require('nodemailer');
-
-const env = require('../../../config/env');
 const { stripe } = require('../../../config/stripeConfig');
 const { calculateOrderAmount } = require('../../../helpers/cart');
 const Track = require("../../models/Track");
+const transporter = require('../../../config/nodemailerConfig');
 
 // to listen for test payment_intent events on windows
 // ./stripe.exe listen --forward-to localhost:5000/stripe/webhooks/handle-payment-intent
@@ -11,9 +9,7 @@ const Track = require("../../models/Track");
 module.exports = {
     createPaymentIntent: async (req, res) => {
         try {
-
-            console.log(req.user);
-            const { items } = req.body;
+            const { items, user } = req.body;
             let meta = {};
 
             for (let i = 0; i < items.length; i++) {
@@ -21,10 +17,10 @@ module.exports = {
                 meta[productID] = items[i].priceID;
             }
 
-            // TODO: add receipt_email to this to send a receipt to the customer through stripe as well
             const paymentIntent = await stripe.paymentIntents.create({
                 amount: await calculateOrderAmount(items),
                 currency: "usd",
+                receipt_email: user,
                 metadata: meta
             });
 
@@ -41,19 +37,29 @@ module.exports = {
 
             switch (event.type) {
                 case 'payment_intent.succeeded':
-                    const paymentData = event.data.object.metadata;
-                    for (const [key, price_id] of Object.entries(paymentData)) {
+                    const paymentData = event.data.object;
+                    for (const [key, price_id] of Object.entries(paymentData.metadata)) {
                         const price = await stripe.prices.retrieve(price_id);
             
                         // if track was sold as exclusive, mark as 'sold as exclusive' in db
                         if (price.metadata.name === 'exclusive') {
                             const product = await stripe.products.retrieve(price.product);
-                            await Track.findOneAndUpdate({ trackName: product.name }, { hasBeenSoldAsExclusive: true});
+                            await Track.findOneAndUpdate({ trackName: product.name }, { hasBeenSoldAsExclusive: true });
                         }
                     }
 
-                    // TODO: email customer track files
-                    console.log(req);
+                    // TODO: email track files to the receipt_email
+                    const mailOpts = {
+                        from: process.env.EMAIL,
+                        to: paymentData.receipt_email,
+                        subject: 'Thanks for Purchasing My Beats!',
+                        text: 'I appreciate your support!!'
+                    };
+
+                    transporter.sendMail(mailOpts, (err, info) => {
+                        if (err) console.log({err});
+                        else console.log('email sent successfully!', {info});
+                    });
 
                     response.status(200).send({ message: "db stuff done with items!"});
                     break;
