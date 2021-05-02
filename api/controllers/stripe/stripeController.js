@@ -2,6 +2,7 @@ const { stripe } = require('../../../config/stripeConfig');
 const { calculateOrderAmount } = require('../../../helpers/cart');
 const Track = require("../../models/Track");
 const transporter = require('../../../config/nodemailerConfig');
+const { generateUrlHelper } = require('../../../helpers/s3');
 
 // to listen for test payment_intent events on windows
 // ./stripe.exe listen --forward-to localhost:5000/stripe/webhooks/handle-payment-intent
@@ -38,23 +39,38 @@ module.exports = {
             switch (event.type) {
                 case 'payment_intent.succeeded':
                     const paymentData = event.data.object;
+                    const attachments = [];
                     for (const [key, price_id] of Object.entries(paymentData.metadata)) {
                         const price = await stripe.prices.retrieve(price_id);
-            
-                        // if track was sold as exclusive, mark as 'sold as exclusive' in db
+                        const product = await stripe.products.retrieve(price.product);
+                        const track = await Track.findOne({stripeProduct: product.id});
+                        const taggedGetUrl = await generateUrlHelper("get", { Key: track.taggedVersion });
+                        const untaggedGetUrl = await generateUrlHelper("get",  { Key: track.untaggedVersion });
+                        const coverArtGetUrl = await generateUrlHelper("get", { Key: track.coverArt });
+
+                        attachments.push({filename: track.taggedVersion, href: taggedGetUrl, contentType: 'audio/mpeg'});
+                        attachments.push({filename: track.untaggedVersion, href: untaggedGetUrl, contentType: 'audio/mpeg'});
+                        attachments.push({filename: track.coverArt, href: coverArtGetUrl, contentType: 'image/*'});
+
+                        console.log({price});
+                        
                         if (price.metadata.name === 'exclusive') {
-                            const product = await stripe.products.retrieve(price.product);
-                            await Track.findOneAndUpdate({ trackName: product.name }, { hasBeenSoldAsExclusive: true });
+                            await Track.findOneAndUpdate({ stripeProduct: product.id }, { hasBeenSoldAsExclusive: true });
+                            const stemsGetUrl = await generateUrlHelper("get",  { Key: track.stems });
+                            attachments.push({filename: track.stems, href: stemsGetUrl, contentType: 'application/zip'});
+                            console.log('this happens!!');
                         }
                     }
 
-                    // TODO: email track files to the receipt_email
                     const mailOpts = {
                         from: process.env.EMAIL,
                         to: paymentData.receipt_email,
                         subject: 'Thanks for Purchasing My Beats!',
-                        text: 'I appreciate your support!!'
+                        text: 'I appreciate your support!!',
+                        attachments
                     };
+
+                    console.log(mailOpts);
 
                     transporter.sendMail(mailOpts, (err, info) => {
                         if (err) console.log({err});

@@ -23,11 +23,13 @@ let Track = new Schema({
     },
     untaggedVersion: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     stems: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     coverArtUrl: {
         type: String,
@@ -35,7 +37,8 @@ let Track = new Schema({
     },
     coverArt: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     canBeSoldAsLease: {
         type: Boolean,
