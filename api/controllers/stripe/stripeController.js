@@ -39,38 +39,40 @@ module.exports = {
             switch (event.type) {
                 case 'payment_intent.succeeded':
                     const paymentData = event.data.object;
-                    const attachments = [];
+                    let htmlBody = 'Thanks for purchasing my beats! Your files are at the links below. These links dont\'t last long so download them now!';
+                    htmlBody += 'Don\'t worry though. You can always come back and get to my site and get the proper links again!\n\n';
                     for (const [key, price_id] of Object.entries(paymentData.metadata)) {
                         const price = await stripe.prices.retrieve(price_id);
                         const product = await stripe.products.retrieve(price.product);
                         const track = await Track.findOne({stripeProduct: product.id});
+
+
                         const taggedGetUrl = await generateUrlHelper("get", { Key: track.taggedVersion });
                         const untaggedGetUrl = await generateUrlHelper("get",  { Key: track.untaggedVersion });
                         const coverArtGetUrl = await generateUrlHelper("get", { Key: track.coverArt });
 
-                        attachments.push({filename: track.taggedVersion, href: taggedGetUrl, contentType: 'audio/mpeg'});
-                        attachments.push({filename: track.untaggedVersion, href: untaggedGetUrl, contentType: 'audio/mpeg'});
-                        attachments.push({filename: track.coverArt, href: coverArtGetUrl, contentType: 'image/*'});
+                        htmlBody += "TAGGED VERSION:\n";
+                        htmlBody += taggedGetUrl + " \n";
+                        htmlBody += "UNTAGGED VERSION:\n";
+                        htmlBody += untaggedGetUrl + " \n";
+                        htmlBody += "COVER ART:\n";
+                        htmlBody += coverArtGetUrl + " \n";
 
-                        console.log({price});
-                        
                         if (price.metadata.name === 'exclusive') {
                             await Track.findOneAndUpdate({ stripeProduct: product.id }, { hasBeenSoldAsExclusive: true });
                             const stemsGetUrl = await generateUrlHelper("get",  { Key: track.stems });
-                            attachments.push({filename: track.stems, href: stemsGetUrl, contentType: 'application/zip'});
-                            console.log('this happens!!');
+                            htmlBody += "STEMS:\n";
+                            htmlBody += stemsGetUrl + " \n";
                         }
+                        
                     }
 
                     const mailOpts = {
                         from: process.env.EMAIL,
                         to: paymentData.receipt_email,
                         subject: 'Thanks for Purchasing My Beats!',
-                        text: 'I appreciate your support!!',
-                        attachments
+                        text: htmlBody
                     };
-
-                    console.log(mailOpts);
 
                     transporter.sendMail(mailOpts, (err, info) => {
                         if (err) console.log({err});
