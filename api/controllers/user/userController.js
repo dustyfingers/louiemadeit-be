@@ -46,8 +46,6 @@ module.exports = {
         }
     },
     fetchUser: async (req, res) => {
-        // TODO: fetch user from db here
-        console.log(req.user);
-        res.send(req.session);
+        // TODO: for user profile page
     }
 };
