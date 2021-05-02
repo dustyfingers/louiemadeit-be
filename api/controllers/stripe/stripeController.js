@@ -39,8 +39,8 @@ module.exports = {
             switch (event.type) {
                 case 'payment_intent.succeeded':
                     const paymentData = event.data.object;
-                    let htmlBody = 'Thanks for purchasing my beats! Your files are at the links below. These links dont\'t last long so download them now!';
-                    htmlBody += 'Don\'t worry though. You can always come back and get to my site and get the proper links again!\n\n';
+                    let htmlBody = 'Thank you for purchasing my beats! Your files are linked below. These links don\'t last long so download them now! ';
+                    htmlBody += 'Don\'t worry too much though - you can always go to my site and get the proper links again!\n\n';
                     for (const [key, price_id] of Object.entries(paymentData.metadata)) {
                         const price = await stripe.prices.retrieve(price_id);
                         const product = await stripe.products.retrieve(price.product);
@@ -52,11 +52,11 @@ module.exports = {
                         const coverArtGetUrl = await generateUrlHelper("get", { Key: track.coverArt });
 
                         htmlBody += "TAGGED VERSION:\n";
-                        htmlBody += taggedGetUrl + " \n";
+                        htmlBody += taggedGetUrl + " \n\n";
                         htmlBody += "UNTAGGED VERSION:\n";
-                        htmlBody += untaggedGetUrl + " \n";
+                        htmlBody += untaggedGetUrl + " \n\n";
                         htmlBody += "COVER ART:\n";
-                        htmlBody += coverArtGetUrl + " \n";
+                        htmlBody += coverArtGetUrl + " \n\n";
 
                         if (price.metadata.name === 'exclusive') {
                             await Track.findOneAndUpdate({ stripeProduct: product.id }, { hasBeenSoldAsExclusive: true });
@@ -64,17 +64,14 @@ module.exports = {
                             htmlBody += "STEMS:\n";
                             htmlBody += stemsGetUrl + " \n";
                         }
-                        
                     }
 
-                    const mailOpts = {
+                    transporter.sendMail({
                         from: process.env.EMAIL,
                         to: paymentData.receipt_email,
                         subject: 'Thanks for Purchasing My Beats!',
                         text: htmlBody
-                    };
-
-                    transporter.sendMail(mailOpts, (err, info) => {
+                    }, (err, info) => {
                         if (err) console.log({err});
                         else console.log('email sent successfully!', {info});
                     });
