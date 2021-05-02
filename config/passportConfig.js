@@ -23,7 +23,7 @@ module.exports = passport => {
                 return done(null, user, {
                     status: 1,
                     message: "Sign In Successful.",
-                    user
+                    user: { email: user.email, isAdmin: user.isAdmin }
                 });
             });
         } catch (error) {
