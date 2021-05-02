@@ -39,8 +39,11 @@ module.exports = {
             switch (event.type) {
                 case 'payment_intent.succeeded':
                     const paymentData = event.data.object;
-                    let htmlBody = 'Thank you for purchasing my beats! Your files are linked below. These links don\'t last long so download them now! ';
-                    htmlBody += 'Don\'t worry too much though - you can always go to my site and get the proper links again!\n\n';
+                    let htmlBody = 'I appreciate your support! Your files are linked below. These links don\'t last long so download them soon! ';
+                    htmlBody += 'Don\'t worry too much though - you can always go to my site and get the proper links again!\n\n\n';
+
+                    htmlBody += 'Thank you,\n'
+                    htmlBody += 'Louie Williford\n\n\n\n\n'
                     for (const [key, price_id] of Object.entries(paymentData.metadata)) {
                         const price = await stripe.prices.retrieve(price_id);
                         const product = await stripe.products.retrieve(price.product);
@@ -50,6 +53,8 @@ module.exports = {
                         const taggedGetUrl = await generateUrlHelper("get", { Key: track.taggedVersion });
                         const untaggedGetUrl = await generateUrlHelper("get",  { Key: track.untaggedVersion });
                         const coverArtGetUrl = await generateUrlHelper("get", { Key: track.coverArt });
+
+                        htmlBody += `${track.trackName.toUpperCase()}\n\n`; 
 
                         htmlBody += "TAGGED VERSION:\n";
                         htmlBody += taggedGetUrl + " \n\n";
@@ -64,6 +69,7 @@ module.exports = {
                             htmlBody += "STEMS:\n";
                             htmlBody += stemsGetUrl + " \n";
                         }
+                        htmlBody += '\n\n';
                     }
 
                     transporter.sendMail({
