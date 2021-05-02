@@ -69,8 +69,8 @@ module.exports = {
                 for (let i = 0; i < tracks.length; i++) {
                     let taggedVersion = tracks[i].taggedVersion;
                     let coverArt = tracks[i].coverArt;
-                    tracks[i].taggedVersionUrl = false || await generateUrlHelper('get', { Key: taggedVersion});
-                    tracks[i].coverArtUrl = false || await generateUrlHelper('get', { Key: coverArt });
+                    tracks[i].taggedVersionUrl = await generateUrlHelper('get', { Key: taggedVersion});
+                    tracks[i].coverArtUrl = await generateUrlHelper('get', { Key: coverArt });
                 }
 
                 res.status(200).send({

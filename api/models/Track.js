@@ -4,15 +4,18 @@ const Schema = mongoose.Schema;
 let Track = new Schema({
     trackName: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     stripeProduct: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     taggedVersion: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     taggedVersionUrl: {
         type: String,
