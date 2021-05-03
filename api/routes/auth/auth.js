@@ -18,7 +18,7 @@ router.post("/sign-in", (req, res, next) => {
                 if (err) throw err;
                 res.status(200).send({
                     status: 1,
-                    user: { email: user.email, isAdmin: user.isAdmin },
+                    user: { email: user.email, isAdmin: user.isAdmin, id: user._id },
                     message: "Successfully Authenticated",
                     cookies: req.signedCookies
                 });
@@ -45,7 +45,7 @@ router.post("/sign-up", (req, res, next) => {
                     if (err) throw err;
                     res.status(200).send({
                         status: 1,
-                        user: { email: newUser.email, isAdmin: newUser.isAdmin },
+                        user: { email: newUser.email, isAdmin: newUser.isAdmin, id: newUser._id },
                         message: "Successfully Authenticated",
                         cookies: req.signedCookies
                     });
@@ -56,9 +56,7 @@ router.post("/sign-up", (req, res, next) => {
 });
 
 // fetch current user
-router.get("/current-user", (req, res) => {
-    res.send({ user: req.user }); // The req.user stores the entire user that has been authenticated inside of it.
-});
+router.get("/current-user", (req, res) => res.send({ user: req.user }));
 
 // user sign out route
 router.post("/sign-out", (req, res) => {

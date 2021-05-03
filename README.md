@@ -31,3 +31,6 @@ step 4:
 
 step 5:
 profit
+
+// to listen for test payment_intent events on windows
+// ./stripe.exe listen --forward-to localhost:5000/stripe/webhooks/handle-payment-intent

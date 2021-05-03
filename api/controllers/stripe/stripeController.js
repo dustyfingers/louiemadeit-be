@@ -4,9 +4,6 @@ const Track = require("../../models/Track");
 const transporter = require('../../../config/nodemailerConfig');
 const { generateUrlHelper } = require('../../../helpers/s3');
 
-// to listen for test payment_intent events on windows
-// ./stripe.exe listen --forward-to localhost:5000/stripe/webhooks/handle-payment-intent
-
 module.exports = {
     createPaymentIntent: async (req, res) => {
         try {
