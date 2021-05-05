@@ -56,13 +56,17 @@ router.post("/sign-up", (req, res, next) => {
 });
 
 // fetch current user
-router.get("/current-user", (req, res) => res.send({ 
-    user: { 
-        email: req.user.email, 
-        isAdmin: req.user.isAdmin, 
-        id: req.user._id 
-    }
-}));
+router.get("/current-user", (req, res) => {
+    if (req.user){
+        res.send({ 
+            user: { 
+                email: req.user.email, 
+                isAdmin: req.user.isAdmin, 
+                id: req.user._id 
+            }
+        });
+    } else res.status(200).send({user: null});
+});
 
 // user sign out route
 router.post("/sign-out", (req, res) => {
