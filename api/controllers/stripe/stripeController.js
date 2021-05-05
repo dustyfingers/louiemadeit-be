@@ -21,7 +21,7 @@ module.exports = {
                 receipt_email: user,
                 metadata: meta
             });
-
+            
             res.send({
                 clientSecret: paymentIntent.client_secret
             });
