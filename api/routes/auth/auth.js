@@ -56,7 +56,13 @@ router.post("/sign-up", (req, res, next) => {
 });
 
 // fetch current user
-router.get("/current-user", (req, res) => res.send({ user: req.user }));
+router.get("/current-user", (req, res) => res.send({ 
+    user: { 
+        email: req.user.email, 
+        isAdmin: req.user.isAdmin, 
+        id: req.user._id 
+    }
+}));
 
 // user sign out route
 router.post("/sign-out", (req, res) => {
