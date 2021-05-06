@@ -15,6 +15,7 @@ router.post("/sign-in", (req, res, next) => {
         if (!user) res.send("No User Exists");
         else {
             console.log({user});
+            console.log('this too!');
             console.log({req});
             req.logIn(user, (err) => {
                 if (err) throw err;
