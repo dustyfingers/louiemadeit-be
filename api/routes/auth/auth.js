@@ -14,6 +14,8 @@ router.post("/sign-in", (req, res, next) => {
         if (err) throw err;
         if (!user) res.send("No User Exists");
         else {
+            console.log({user});
+            console.log({req});
             req.logIn(user, (err) => {
                 if (err) throw err;
                 res.status(200).send({
@@ -57,6 +59,8 @@ router.post("/sign-up", (req, res, next) => {
 
 // fetch current user
 router.get("/current-user", (req, res) => {
+    console.log(req.user);
+    console.log(req.session);
     if (req.user){
         res.send({ 
             user: { 
