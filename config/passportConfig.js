@@ -20,6 +20,8 @@ module.exports = passport => {
                     err: "Invalid Credentials"
                 });
         
+                console.log({userInPassportConfig: user});
+                
                 return done(null, user, {
                     status: 1,
                     message: "Sign In Successful.",
