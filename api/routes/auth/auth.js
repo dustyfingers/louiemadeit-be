@@ -16,7 +16,6 @@ router.post("/sign-in", (req, res, next) => {
         else {
             req.logIn(user, (err) => {
                 if (err) throw err;
-                console.log(req.session);
                 res.status(200).send({
                     status: 1,
                     user: { email: user.email, isAdmin: user.isAdmin, id: user._id },
@@ -58,9 +57,8 @@ router.post("/sign-up", (req, res, next) => {
 
 // fetch current user
 router.get("/current-user", (req, res) => {
-    console.log({req});
     if (req.user) {
-        console.log({user: req.user});
+        console.log({requestUser: req.user});
         res.send({ 
             user: { 
                 email: req.user.email, 
