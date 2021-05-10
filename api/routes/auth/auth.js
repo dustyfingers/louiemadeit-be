@@ -8,7 +8,7 @@ const User = require("../../models/User");
 // init router
 const router = express.Router();
 
-// user sign in route
+// sign in route
 router.post("/sign-in", (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
         if (err) throw err;
@@ -16,6 +16,7 @@ router.post("/sign-in", (req, res, next) => {
         else {
             req.logIn(user, (err) => {
                 if (err) throw err;
+                console.log(req.session);
                 res.status(200).send({
                     status: 1,
                     user: { email: user.email, isAdmin: user.isAdmin, id: user._id },
@@ -27,7 +28,7 @@ router.post("/sign-in", (req, res, next) => {
     })(req, res, next);
 });
 
-// user sign up route
+// sign up route
 router.post("/sign-up", (req, res, next) => {
     User.findOne({ email: req.body.email }, async (err, doc) => {
         if (err) res.status(400).send({ status: 0, message: "Error Creating User"});
