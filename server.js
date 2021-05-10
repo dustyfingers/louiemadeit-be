@@ -32,7 +32,7 @@ const store = MongoDBSession({
 const server = express();
 server.use(express.json());
 server.use(bodyParser.urlencoded({ extended: true }));
-server.use(cookieParser());
+server.use(cookieParser(env.sessionSecret));
 server.use(cors({ origin: env.origin, credentials: true }));
 server.use(session({
     secret: env.sessionSecret,
