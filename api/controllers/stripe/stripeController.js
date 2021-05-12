@@ -26,7 +26,8 @@ module.exports = {
                 clientSecret: paymentIntent.client_secret
             });
         } catch (error) {
-            res.status(400).send({success: 0, message: 'Error while creating payment intent.', error})
+            console.log(error);
+            res.status(400).send({success: 0, message: 'Error while creating payment intent.', error});
         }
     },
     handlePaymentIntent: async (req, res) => {
