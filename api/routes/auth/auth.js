@@ -16,7 +16,6 @@ router.post("/sign-in", (req, res, next) => {
         else {
             req.logIn(user, (err) => {
                 if (err) throw err;
-                console.log('inside cb of req.logIn');
                 res.status(200).send({
                     status: 1,
                     user: { email: user.email, isAdmin: user.isAdmin, id: user._id },
@@ -24,7 +23,6 @@ router.post("/sign-in", (req, res, next) => {
                     cookies: req.signedCookies
                 });
             });
-            console.log('after req.logIn');
         }
     })(req, res, next);
 });
@@ -59,7 +57,6 @@ router.post("/sign-up", (req, res, next) => {
 
 // fetch current user
 router.get("/current-user", (req, res) => {
-    console.log({requestUser: req.user});
     if (req.user) {
         res.send({ 
             user: { 

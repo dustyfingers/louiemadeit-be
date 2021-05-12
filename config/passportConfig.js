@@ -19,8 +19,6 @@ module.exports = passport => {
                     message: "There was an error logging in given your password. Please try again using different credentials.",
                     err: "Invalid Credentials"
                 });
-        
-                console.log({userInPassportConfig: user});
                 
                 return done(null, user, {
                     status: 1,
