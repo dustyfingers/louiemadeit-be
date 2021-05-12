@@ -21,7 +21,7 @@ const authRoutes = require("./api/routes/auth/auth"),
     s3Routes = require("./api/routes/s3/s3"),
     stripeRoutes = require("./api/routes/stripe/checkout");
 
-const corsWhitelist = [env.origin, "https://api.stripe.com"];
+const corsWhitelist = [env.origin, undefined];
 
 // connect to db & create session store
 mongoose.connect(env.dbPath, dbOpts);
@@ -36,6 +36,7 @@ server.use(express.json());
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(cookieParser(env.sessionSecret));
 server.use(cors({ origin: (og, cb) => {
+    console.log(og);
     if (corsWhitelist.indexOf(og) !== -1) cb(null, true);
     else cb(new Error('Not allowed by CORS'));
 }, credentials: true }));
