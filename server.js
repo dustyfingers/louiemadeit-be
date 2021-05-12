@@ -36,7 +36,6 @@ server.use(express.json());
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(cookieParser(env.sessionSecret));
 server.use(cors({ origin: (og, cb) => {
-    console.log(og);
     if (corsWhitelist.indexOf(og) !== -1) cb(null, true);
     else cb(new Error('Not allowed by CORS'));
 }, credentials: true }));
