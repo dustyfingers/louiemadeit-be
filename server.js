@@ -21,7 +21,7 @@ const authRoutes = require("./api/routes/auth/auth"),
     s3Routes = require("./api/routes/s3/s3"),
     stripeRoutes = require("./api/routes/stripe/checkout");
 
-const corsWhitelist = [env.origin, "api.stripe.com"];
+const corsWhitelist = [env.origin, "https://api.stripe.com"];
 
 // connect to db & create session store
 mongoose.connect(env.dbPath, dbOpts);
