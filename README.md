@@ -1,7 +1,7 @@
 <!-- deployed to heroku/mongodb atlas for dev -->
 <!-- will probably do the same for prod -->
 
-setup prerequisites:
+local setup prerequisites:
 nodejs/npm
 mongodb
 
@@ -17,6 +17,8 @@ SESSION_SECRET=
 STRIPE_SK=
 ORIGIN=http://localhost:3000
 SAME_SITE=lax
+EMAIL=
+EMAIL_PASSWORD=
 
 step 2:
 npm install in root project dir
@@ -27,4 +29,8 @@ npm run dev
 step 4:
 ???
 
-step 5: profit
+step 5:
+profit
+
+// to listen for test payment_intent events on windows
+// ./stripe.exe listen --forward-to localhost:5000/stripe/webhooks/handle-payment-intent

@@ -19,11 +19,11 @@ module.exports = passport => {
                     message: "There was an error logging in given your password. Please try again using different credentials.",
                     err: "Invalid Credentials"
                 });
-        
+                
                 return done(null, user, {
                     status: 1,
                     message: "Sign In Successful.",
-                    user
+                    user: { email: user.email, isAdmin: user.isAdmin, id: user._id }
                 });
             });
         } catch (error) {

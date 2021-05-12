@@ -9,7 +9,7 @@ module.exports = {
         try {
             const stripeTrack = await stripe.products.create({ name: req.body.trackName });
 
-            await stripe.prices.create({
+            const leaseStripePriceStems = await stripe.prices.create({
                 product: stripeTrack.id,
                 currency: "usd",
                 unit_amount: 2999,
@@ -17,7 +17,8 @@ module.exports = {
                     name: 'lease'
                 }
             });
-            await stripe.prices.create({
+            
+            const leaseStripePriceMaster = await stripe.prices.create({
                 product: stripeTrack.id,
                 currency: "usd",
                 unit_amount: 4999,
@@ -26,16 +27,24 @@ module.exports = {
                 }
             });
 
-            await stripe.prices.create({
+            const exclusiveStripePrice = await stripe.prices.create({
                 product: stripeTrack.id,
                 currency: "usd",
-                unit_amount: 4999,
+                unit_amount: 14999,
                 metadata: {
                     name: 'exclusive'
                 }
             });
 
-            const track = await Track.create({ ...req.body, stripeProduct: stripeTrack.id });
+            const track = await Track.create({ 
+                ...req.body, 
+                prices: {
+                    exclusiveStripePrice: exclusiveStripePrice.id, 
+                    leaseStripePriceMaster: leaseStripePriceMaster.id,
+                    leaseStripePriceStems: leaseStripePriceStems.id
+                },
+                stripeProduct: stripeTrack.id 
+            });
 
             res.status(200).send({
                 status: 1,
@@ -60,8 +69,8 @@ module.exports = {
                 for (let i = 0; i < tracks.length; i++) {
                     let taggedVersion = tracks[i].taggedVersion;
                     let coverArt = tracks[i].coverArt;
-                    tracks[i].taggedVersionUrl = false || await generateUrlHelper('get', { Key: taggedVersion});
-                    tracks[i].coverArtUrl = false || await generateUrlHelper('get', { Key: coverArt });
+                    tracks[i].taggedVersionUrl = await generateUrlHelper('get', { Key: taggedVersion});
+                    tracks[i].coverArtUrl = await generateUrlHelper('get', { Key: coverArt });
                 }
 
                 res.status(200).send({

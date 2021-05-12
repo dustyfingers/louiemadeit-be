@@ -4,15 +4,18 @@ const Schema = mongoose.Schema;
 let Track = new Schema({
     trackName: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     stripeProduct: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     taggedVersion: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     taggedVersionUrl: {
         type: String,
@@ -20,11 +23,13 @@ let Track = new Schema({
     },
     untaggedVersion: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     stems: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     coverArtUrl: {
         type: String,
@@ -32,7 +37,8 @@ let Track = new Schema({
     },
     coverArt: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     canBeSoldAsLease: {
         type: Boolean,
@@ -59,13 +65,25 @@ let Track = new Schema({
             type: Number,
             default: 149.99
         },
+        exclusiveStripePrice: {
+            type: String,
+            required: true
+        },
         leasePriceMaster: {
             type: Number,
             default: 29.99
         },
+        leaseStripePriceMaster: {
+            type: String,
+            required: true
+        },
         leasePriceStems: {
             type: Number,
             default: 49.99
+        },
+        leaseStripePriceStems: {
+            type: String,
+            required: true
         },
     },
     createdAt: {

@@ -1,51 +1,88 @@
-const env = require('../../../config/env');
-
 const { stripe } = require('../../../config/stripeConfig');
-
-const calculateOrderAmount = items => {
-    // TODO: ! important!!!
-    // Replace this constant with a calculation of the order's amount
-    // Calculate the order total on the server to prevent
-    // people from directly manipulating the amount on the client
-    return 1400;
-};
+const { calculateOrderAmount } = require('../../../helpers/cart');
+const Track = require("../../models/Track");
+const transporter = require('../../../config/nodemailerConfig');
+const { generateUrlHelper } = require('../../../helpers/s3');
 
 module.exports = {
     createPaymentIntent: async (req, res) => {
         try {
-            const { items } = req.body;
-            console.log(items);
+            const { items, user } = req.body;
+            let meta = {};
 
-            // Create a PaymentIntent with the order amount and currency
+            for (let i = 0; i < items.length; i++) {
+                const productID = items[i].trackID;
+                meta[productID] = items[i].priceID;
+            }
+
             const paymentIntent = await stripe.paymentIntents.create({
-                amount: calculateOrderAmount(items),
-                currency: "usd"
+                amount: await calculateOrderAmount(items),
+                currency: "usd",
+                receipt_email: user,
+                metadata: meta
             });
+            
             res.send({
                 clientSecret: paymentIntent.client_secret
             });
         } catch (error) {
-            res.status(400).send({success: 0, message: 'Error while creating payment intent.', error})
+            res.status(400).send({success: 0, message: 'Error while creating payment intent.', error});
         }
     },
     handlePaymentIntent: async (req, res) => {
         try {
             const event = req.body;
-            console.log(event.type);
 
             switch (event.type) {
                 case 'payment_intent.succeeded':
-                    const paymentIntent = event.data.object;
-                    console.log(`Payment intent for ${paymentIntent.amount} was successful!`);
+                    const paymentData = event.data.object;
+                    let htmlBody = 'I appreciate your support! Your files are linked below. These links don\'t last long so download them soon! ';
+                    htmlBody += 'Don\'t worry too much though - you can always go to my site and get the proper links again!\n\n\n';
 
-                    // TODO: mark item as sold in db here
-                    // handlePaymentIntentSucceeded(paymentIntent);
+                    htmlBody += 'Thank you,\n'
+                    htmlBody += 'Louie Williford\n\n\n\n\n'
+                    for (const [key, price_id] of Object.entries(paymentData.metadata)) {
+                        const price = await stripe.prices.retrieve(price_id);
+                        const product = await stripe.products.retrieve(price.product);
+                        const track = await Track.findOne({stripeProduct: product.id});
+
+
+                        const taggedGetUrl = await generateUrlHelper("get", { Key: track.taggedVersion });
+                        const untaggedGetUrl = await generateUrlHelper("get",  { Key: track.untaggedVersion });
+                        const coverArtGetUrl = await generateUrlHelper("get", { Key: track.coverArt });
+
+                        htmlBody += `${track.trackName.toUpperCase()}\n\n`; 
+
+                        htmlBody += "TAGGED VERSION:\n";
+                        htmlBody += taggedGetUrl + " \n\n";
+                        htmlBody += "UNTAGGED VERSION:\n";
+                        htmlBody += untaggedGetUrl + " \n\n";
+                        htmlBody += "COVER ART:\n";
+                        htmlBody += coverArtGetUrl + " \n\n";
+
+                        if (price.metadata.name === 'exclusive') {
+                            await Track.findOneAndUpdate({ stripeProduct: product.id }, { hasBeenSoldAsExclusive: true });
+                            const stemsGetUrl = await generateUrlHelper("get",  { Key: track.stems });
+                            htmlBody += "STEMS:\n";
+                            htmlBody += stemsGetUrl + " \n";
+                        }
+                        htmlBody += '\n\n';
+                    }
+
+                    transporter.sendMail({
+                        from: process.env.EMAIL,
+                        to: paymentData.receipt_email,
+                        subject: 'Thanks for Purchasing My Beats!',
+                        text: htmlBody
+                    }, (err, info) => {
+                        if (err) console.log({err});
+                        else console.log('email sent successfully!', {info});
+                    });
 
                     response.status(200).send({ message: "db stuff done with items!"});
-                    
                     break;
+                    
                 default:
-                    console.log(`Unknown event type ${event.type}`);
                     break;
             }
 
