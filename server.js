@@ -34,6 +34,7 @@ server.use(express.json());
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(cookieParser(env.sessionSecret));
 server.use(cors({ origin: env.origin, credentials: true }));
+if (env.origin !== 'http://localhost:3000') server.enable('trust proxy', 1);
 server.use(session({
     secret: env.sessionSecret,
     resave: true,
