@@ -5,6 +5,5 @@ module.exports = {
         if (req.user._id == req.params.user_id) {
             res.status(200).send({ message: 'Good to go!'});
         } else res.status(401).send({ message: 'Wrong user!'});
-
     }
 };

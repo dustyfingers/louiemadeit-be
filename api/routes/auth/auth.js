@@ -57,6 +57,7 @@ router.post("/sign-up", (req, res, next) => {
 
 // fetch current user
 router.get("/current-user", (req, res) => {
+    console.log({user: req.user});
     if (req.user) {
         res.send({ 
             user: { 
