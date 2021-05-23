@@ -12,6 +12,6 @@ router.post("/new-payment-intent", (req, res) => stripeController.createPaymentI
 router.post("/webhooks/handle-payment-intent", (req, res) => stripeController.handlePaymentIntent(req, res));
 
 // fetch a users purchased tracks
-router.get("/purchased-tracks", (req, res) => stripeController.fetchCustomerTracks(req, res));
+router.get("/purchased-tracks", (req, res) => stripeController.fetchPurchasedTracks(req, res));
 
 module.exports = router;

@@ -7,7 +7,8 @@ const { generateUrlHelper } = require('../../../helpers/s3');
 module.exports = {
     createPaymentIntent: async (req, res) => {
         try {
-            const { items, user } = req.body;
+            const { stripeCustomerId, email } = req.user;
+            const { items } = req.body;
             let meta = {};
 
             for (let i = 0; i < items.length; i++) {
@@ -17,16 +18,17 @@ module.exports = {
 
             const paymentIntent = await stripe.paymentIntents.create({
                 amount: await calculateOrderAmount(items),
+                customer: stripeCustomerId,
                 currency: "usd",
-                receipt_email: user,
+                receipt_email: email,
                 metadata: meta
             });
             
-            res.send({
+            res.status(200).send({
                 clientSecret: paymentIntent.client_secret
             });
         } catch (error) {
-            res.status(400).send({success: 0, message: 'Error while creating payment intent.', error});
+            res.status(400).send({message: 'Error while creating payment intent.', error});
         }
     },
     handlePaymentIntent: async (req, res) => {
@@ -89,12 +91,12 @@ module.exports = {
             res.status(200).send();
 
         } catch (error) {
-            res.status(400).send({success: 0, message: 'Error while handling payment intent.', error})
+            res.status(400).send({message: 'Error while handling payment intent.', error})
         }
     },
     fetchPurchasedTracks: async (req, res) => {
-        console.log(req);
-        const purchasedItems = await stripe.orders.list({ customer: "stripe_id_here" });
-        res.status(200).send({ message: "Payment intent handled successfully!", purchasedItems});
+        const { stripeCustomerId } = req.user;
+        const purchasedItems = await stripe.orders.list({ customer: stripeCustomerId });
+        res.status(200).send({ message: "Purchased tracks fetched successfully!", purchasedItems});
     }
 };
