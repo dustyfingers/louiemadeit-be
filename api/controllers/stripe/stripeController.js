@@ -79,14 +79,14 @@ module.exports = {
                         else console.log('email sent successfully!', {info});
                     });
 
-                    response.status(200).send({ message: "db stuff done with items!"});
+                    res.status(200).send({ message: "db stuff done with items!"});
                     break;
                     
                 default:
                     break;
             }
 
-            response.status(200).send();
+            res.status(200).send();
 
         } catch (error) {
             console.log({error});
