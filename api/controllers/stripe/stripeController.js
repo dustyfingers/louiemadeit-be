@@ -36,11 +36,11 @@ module.exports = {
             switch (event.type) {
                 case 'payment_intent.succeeded':
                     const paymentData = event.data.object;
-                    let htmlBody = 'I appreciate your support! Your files are linked below. The links don\'t last long so use them soon! ';
-                    htmlBody += 'Don\'t worry too much though - you can always go to www.louiemadeit.com, sign in and download your files again on the \'my licenses\' page.\n\n\n';
+                    let htmlBody = 'Here are your files. The links don\'t last long so use them soon! ';
+                    htmlBody += 'Don\'t worry too much though - you can always go to www.louiemadeit.com, sign in and download your files again from your profile page.\n\n\n';
 
-                    htmlBody += 'Thank you,\n'
-                    htmlBody += 'Louie Williford\n\n\n\n\n'
+                    htmlBody += 'Thanks for your support,\n'
+                    htmlBody += 'louiemadeit\n\n\n\n\n'
                     
                     for (const [key, price_id] of Object.entries(paymentData.metadata)) {
                         const price = await stripe.prices.retrieve(price_id);
@@ -92,4 +92,9 @@ module.exports = {
             res.status(400).send({success: 0, message: 'Error while handling payment intent.', error})
         }
     },
+    fetchPurchasedTracks: async (req, res) => {
+        console.log(req);
+        const purchasedItems = await stripe.orders.list({ customer: "stripe_id_here" });
+        res.status(200).send({ message: "Payment intent handled successfully!", purchasedItems});
+    }
 };
