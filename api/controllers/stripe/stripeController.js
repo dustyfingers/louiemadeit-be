@@ -36,11 +36,12 @@ module.exports = {
             switch (event.type) {
                 case 'payment_intent.succeeded':
                     const paymentData = event.data.object;
-                    let htmlBody = 'I appreciate your support! Your files are linked below. These links don\'t last long so download them soon! ';
-                    htmlBody += 'Don\'t worry too much though - you can always go to my site and get the proper links again!\n\n\n';
+                    let htmlBody = 'I appreciate your support! Your files are linked below. The links don\'t last long so use them soon! ';
+                    htmlBody += 'Don\'t worry too much though - you can always go to www.louiemadeit.com, sign in and download your files again on the \'my licenses\' page.\n\n\n';
 
                     htmlBody += 'Thank you,\n'
                     htmlBody += 'Louie Williford\n\n\n\n\n'
+                    
                     for (const [key, price_id] of Object.entries(paymentData.metadata)) {
                         const price = await stripe.prices.retrieve(price_id);
                         const product = await stripe.products.retrieve(price.product);
@@ -72,7 +73,7 @@ module.exports = {
                     transporter.sendMail({
                         from: process.env.EMAIL,
                         to: paymentData.receipt_email,
-                        subject: 'Thanks for Purchasing My Beats!',
+                        subject: 'Thank You For Purchasing My Beats!',
                         text: htmlBody
                     }, (err, info) => {
                         if (err) console.log({err});
