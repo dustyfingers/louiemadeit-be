@@ -76,10 +76,9 @@ module.exports = {
                         text: htmlBody
                     }, (err, info) => {
                         if (err) console.log({err});
-                        else console.log('email sent successfully!', {info});
                     });
 
-                    res.status(200).send({ message: "db stuff done with items!"});
+                    res.status(200).send({ message: "Payment intent handled successfully!"});
                     break;
                     
                 default:
@@ -89,7 +88,6 @@ module.exports = {
             res.status(200).send();
 
         } catch (error) {
-            console.log({error});
             res.status(400).send({success: 0, message: 'Error while handling payment intent.', error})
         }
     },
