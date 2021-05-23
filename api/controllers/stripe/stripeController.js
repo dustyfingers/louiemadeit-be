@@ -89,6 +89,7 @@ module.exports = {
             response.status(200).send();
 
         } catch (error) {
+            console.log({error});
             res.status(400).send({success: 0, message: 'Error while handling payment intent.', error})
         }
     },
