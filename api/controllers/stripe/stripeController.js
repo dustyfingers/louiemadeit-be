@@ -96,7 +96,8 @@ module.exports = {
     },
     fetchPurchasedTracks: async (req, res) => {
         const { stripeCustomerId } = req.user;
-        const purchasedItems = await stripe.orders.list({ customer: stripeCustomerId });
-        res.status(200).send({ message: "Purchased tracks fetched successfully!", purchasedItems});
+        const customerOrders = await stripe.paymentIntents.list({customer: stripeCustomerId});
+        let results = customerOrders.data.filter(order => order.status === 'succeeded');
+        res.status(200).send({message: "Purchased tracks fetched successfully!", customerOrders: results});
     }
 };
