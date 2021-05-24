@@ -54,7 +54,7 @@ module.exports = {
                         const untaggedGetUrl = await generateUrlHelper("get",  { Key: track.untaggedVersion });
                         const coverArtGetUrl = await generateUrlHelper("get", { Key: track.coverArt });
 
-                        htmlBody += `${track.trackName.toUpperCase()}\n\n`; 
+                        htmlBody += `${track.trackName.toUpperCase()}\n\n`;
 
                         htmlBody += "TAGGED VERSION:\n";
                         htmlBody += taggedGetUrl + " \n\n";
@@ -96,8 +96,26 @@ module.exports = {
     },
     fetchPurchasedTracks: async (req, res) => {
         const { stripeCustomerId } = req.user;
-        const customerOrders = await stripe.paymentIntents.list({customer: stripeCustomerId});
-        let results = customerOrders.data.filter(order => order.status === 'succeeded');
-        res.status(200).send({message: "Purchased tracks fetched successfully!", customerOrders: results});
+        const stripeOrders = await stripe.paymentIntents.list({customer: stripeCustomerId});
+        const succeededOrders = stripeOrders.data.filter(order => order.status === 'succeeded');
+        let stripeProductsPurchased = [], tracksPurchased = [];
+
+        for (let i = 0; i < succeededOrders.length; i++) {
+            for (let product in succeededOrders[i].metadata) {
+                stripeProductsPurchased.push(product);
+            }
+        }
+
+        for (let i = 0; i < stripeProductsPurchased.length; i++) {
+            const track = await Track.find({stripeProduct: stripeProductsPurchased[i]});
+            console.log(track);
+            const taggedGetUrl = await generateUrlHelper("get", { Key: track.taggedVersion });
+            const untaggedGetUrl = await generateUrlHelper("get",  { Key: track.untaggedVersion });
+            const coverArtGetUrl = await generateUrlHelper("get", { Key: track.coverArt });
+            
+            tracksPurchased.push({trackName: track.trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl});
+        }
+        
+        res.status(200).send({message: "Purchased tracks fetched successfully!", customerOrders: tracksPurchased});
     }
 };
