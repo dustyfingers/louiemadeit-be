@@ -74,7 +74,7 @@ module.exports = {
                         to: paymentData.receipt_email,
                         subject: 'Thank You For Purchasing My Beats!',
                         text: htmlBody
-                    }, (err, info) => { if (err) console.log({err}) });
+                    }, (err, info) => { if (error) console.log({error}) });
 
                     res.status(200).send({ message: "Payment intent handled successfully!"});
                     break;
@@ -94,7 +94,7 @@ module.exports = {
             const { stripeCustomerId } = req.user;
             const stripeOrders = await stripe.paymentIntents.list({customer: stripeCustomerId});
             const succeededOrders = stripeOrders.data.filter(order => order.status === 'succeeded');
-            let stripeProductsPurchased = [], tracksPurchased = [];
+            let stripeProductsPurchased = [], purchasedTracks = [];
     
             for (let i = 0; i < succeededOrders.length; i++) {
                 for (let product in succeededOrders[i].metadata) {
@@ -107,10 +107,10 @@ module.exports = {
                 const taggedGetUrl = await generateUrlHelper("get", { Key: track[0].taggedVersion });
                 const untaggedGetUrl = await generateUrlHelper("get",  { Key: track[0].untaggedVersion });
                 const coverArtGetUrl = await generateUrlHelper("get", { Key: track[0].coverArt });
-                tracksPurchased.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl});
+                purchasedTracks.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl});
             }
             
-            res.status(200).send({message: "Purchased tracks fetched successfully!", customerOrders: tracksPurchased});
+            res.status(200).send({message: "Purchased tracks fetched successfully!", purchasedTracks});
         } catch (error) {
             res.status(400).send({message: 'Error while fetching purchased tracks.', error});
         }
