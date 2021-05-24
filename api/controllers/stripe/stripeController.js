@@ -49,21 +49,18 @@ module.exports = {
                         const product = await stripe.products.retrieve(price.product);
                         const track = await Track.findOne({stripeProduct: product.id});
 
-
                         const taggedGetUrl = await generateUrlHelper("get", { Key: track.taggedVersion });
                         const untaggedGetUrl = await generateUrlHelper("get",  { Key: track.untaggedVersion });
                         const coverArtGetUrl = await generateUrlHelper("get", { Key: track.coverArt });
 
                         htmlBody += `${track.trackName.toUpperCase()}\n\n`;
-
                         htmlBody += "TAGGED VERSION:\n";
                         htmlBody += taggedGetUrl + " \n\n";
                         htmlBody += "UNTAGGED VERSION:\n";
                         htmlBody += untaggedGetUrl + " \n\n";
                         htmlBody += "COVER ART:\n";
                         htmlBody += coverArtGetUrl + " \n\n";
-
-                        if (price.metadata.name === 'exclusive') {
+                        if (price.metadata.name === 'exclusive' || price.metadata.name === 'lease') {
                             await Track.findOneAndUpdate({ stripeProduct: product.id }, { hasBeenSoldAsExclusive: true });
                             const stemsGetUrl = await generateUrlHelper("get",  { Key: track.stems });
                             htmlBody += "STEMS:\n";
@@ -77,9 +74,7 @@ module.exports = {
                         to: paymentData.receipt_email,
                         subject: 'Thank You For Purchasing My Beats!',
                         text: htmlBody
-                    }, (err, info) => {
-                        if (err) console.log({err});
-                    });
+                    }, (err, info) => { if (err) console.log({err}) });
 
                     res.status(200).send({ message: "Payment intent handled successfully!"});
                     break;
@@ -91,31 +86,33 @@ module.exports = {
             res.status(200).send();
 
         } catch (error) {
-            res.status(400).send({message: 'Error while handling payment intent.', error})
+            res.status(400).send({message: 'Error while handling payment intent.', error});
         }
     },
     fetchPurchasedTracks: async (req, res) => {
-        const { stripeCustomerId } = req.user;
-        const stripeOrders = await stripe.paymentIntents.list({customer: stripeCustomerId});
-        const succeededOrders = stripeOrders.data.filter(order => order.status === 'succeeded');
-        let stripeProductsPurchased = [], tracksPurchased = [];
-
-        for (let i = 0; i < succeededOrders.length; i++) {
-            for (let product in succeededOrders[i].metadata) {
-                stripeProductsPurchased.push(product);
+        try {
+            const { stripeCustomerId } = req.user;
+            const stripeOrders = await stripe.paymentIntents.list({customer: stripeCustomerId});
+            const succeededOrders = stripeOrders.data.filter(order => order.status === 'succeeded');
+            let stripeProductsPurchased = [], tracksPurchased = [];
+    
+            for (let i = 0; i < succeededOrders.length; i++) {
+                for (let product in succeededOrders[i].metadata) {
+                    stripeProductsPurchased.push(product);
+                }
             }
-        }
-
-        for (let i = 0; i < stripeProductsPurchased.length; i++) {
-            const track = await Track.find({stripeProduct: stripeProductsPurchased[i]});
-            console.log(track);
-            const taggedGetUrl = await generateUrlHelper("get", { Key: track.taggedVersion });
-            const untaggedGetUrl = await generateUrlHelper("get",  { Key: track.untaggedVersion });
-            const coverArtGetUrl = await generateUrlHelper("get", { Key: track.coverArt });
+    
+            for (let i = 0; i < stripeProductsPurchased.length; i++) {
+                const track = await Track.find({stripeProduct: stripeProductsPurchased[i]});
+                const taggedGetUrl = await generateUrlHelper("get", { Key: track[0].taggedVersion });
+                const untaggedGetUrl = await generateUrlHelper("get",  { Key: track[0].untaggedVersion });
+                const coverArtGetUrl = await generateUrlHelper("get", { Key: track[0].coverArt });
+                tracksPurchased.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl});
+            }
             
-            tracksPurchased.push({trackName: track.trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl});
+            res.status(200).send({message: "Purchased tracks fetched successfully!", customerOrders: tracksPurchased});
+        } catch (error) {
+            res.status(400).send({message: 'Error while fetching purchased tracks.', error});
         }
-        
-        res.status(200).send({message: "Purchased tracks fetched successfully!", customerOrders: tracksPurchased});
     }
 };
