@@ -101,8 +101,6 @@ module.exports = {
                     stripeProductsPurchased.push([product, price]);
                 }
             }
-
-            console.log({stripeProductsPurchased});
     
             for (let i = 0; i < stripeProductsPurchased.length; i++) {
                 const track = await Track.find({stripeProduct: stripeProductsPurchased[i][0]});
@@ -119,7 +117,6 @@ module.exports = {
             
             res.status(200).send({message: "Purchased tracks fetched successfully!", purchasedTracks});
         } catch (error) {
-            console.log(error)
             res.status(400).send({message: 'Error while fetching purchased tracks.', error});
         }
     }
