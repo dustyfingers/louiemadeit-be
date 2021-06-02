@@ -92,26 +92,34 @@ module.exports = {
     fetchPurchasedTracks: async (req, res) => {
         try {
             const { stripeCustomerId } = req.user;
-            const stripeOrders = await stripe.paymentIntents.list({customer: stripeCustomerId});
-            const succeededOrders = stripeOrders.data.filter(order => order.status === 'succeeded');
+            const allStripeOrders = await stripe.paymentIntents.list({customer: stripeCustomerId});
+            const succeededOrders = allStripeOrders.data.filter(order => order.status === 'succeeded');
             let stripeProductsPurchased = [], purchasedTracks = [];
-    
+
             for (let i = 0; i < succeededOrders.length; i++) {
-                for (let product in succeededOrders[i].metadata) {
-                    stripeProductsPurchased.push(product);
+                for (const [product, price] of Object.entries(succeededOrders[i].metadata)) {
+                    stripeProductsPurchased.push([product, price]);
                 }
             }
+
+            console.log({stripeProductsPurchased});
     
             for (let i = 0; i < stripeProductsPurchased.length; i++) {
-                const track = await Track.find({stripeProduct: stripeProductsPurchased[i]});
+                const track = await Track.find({stripeProduct: stripeProductsPurchased[i][0]});
+                const { metadata: { name } } = await stripe.prices.retrieve(stripeProductsPurchased[i][1]);
+                const trackPurchasedAsExclusive = name === "exclusive";
                 const taggedGetUrl = await generateUrlHelper("get", { Key: track[0].taggedVersion });
                 const untaggedGetUrl = await generateUrlHelper("get",  { Key: track[0].untaggedVersion });
                 const coverArtGetUrl = await generateUrlHelper("get", { Key: track[0].coverArt });
-                purchasedTracks.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl});
+                const stemsGetUrl = await generateUrlHelper("get", { Key: track[0].stems });
+
+                if (trackPurchasedAsExclusive) purchasedTracks.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl, stemsGetUrl});
+                else purchasedTracks.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl});
             }
             
             res.status(200).send({message: "Purchased tracks fetched successfully!", purchasedTracks});
         } catch (error) {
+            console.log(error)
             res.status(400).send({message: 'Error while fetching purchased tracks.', error});
         }
     }
