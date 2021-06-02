@@ -52,12 +52,11 @@ module.exports = {
                 data: track
             });
         } catch (err) {
-            const responseBody = {
+            res.status(400).send({
                 status: 0,
                 message: "There was an error creating this track.",
                 err
-            };
-            res.status(400).send(responseBody);
+            });
         }
     },
     fetchAllCurrentTracks: async (req, res) => {

@@ -19,7 +19,7 @@ const authRoutes = require("./api/routes/auth/auth"),
     userRoutes = require("./api/routes/user/user"),
     trackRoutes = require("./api/routes/track/track"),
     s3Routes = require("./api/routes/s3/s3"),
-    stripeRoutes = require("./api/routes/stripe/checkout");
+    stripeRoutes = require("./api/routes/stripe/stripe");
 
 const corsWhitelist = [env.origin, undefined];
 

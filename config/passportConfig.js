@@ -27,7 +27,7 @@ module.exports = passport => {
                 });
             });
         } catch (error) {
-            res.status(400).send({success: 0, message: 'No user found.', error})
+            res.status(400).send({message: 'No user found.', error})
         }
     }));
     passport.serializeUser((user, done) => done(null, user.id));
