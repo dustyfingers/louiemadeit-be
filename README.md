@@ -1,12 +1,17 @@
-<!-- deployed to heroku/mongodb atlas for dev -->
-<!-- will probably do the same for prod -->
+## local setup prerequisites:
 
-local setup prerequisites:
 nodejs/npm
 mongodb
+stripe.exe downloaded
 
-PROJECT SETUP:
-step 1:
+## PROJECT SETUP:
+
+# step 1:
+
+navigate to project dir
+
+# step 2:
+
 set up .env file in root project dir with the proper credentials:
 AWS_ACCESSKEY=
 AWS_ACCESSKEY_ID=
@@ -20,17 +25,14 @@ SAME_SITE=lax
 EMAIL=
 EMAIL_PASSWORD=
 
-step 2:
-npm install in root project dir
+# step 3:
 
-step 3:
-npm run dev
+run 'npm install'
 
-step 4:
-???
+# step 4:
 
-step 5:
-profit
+run 'npm run dev'
 
-// to listen for test payment_intent events on windows
-// ./stripe.exe listen --forward-to localhost:5000/stripe/webhooks/handle-payment-intent
+# to listen for test payment_intent events on windows, run this where stripe is downloaded
+
+./stripe.exe listen --forward-to localhost:5000/stripe/webhooks/handle-payment-intent
