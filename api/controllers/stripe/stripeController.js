@@ -74,7 +74,7 @@ module.exports = {
                         to: paymentData.receipt_email,
                         subject: 'Thank You For Purchasing My Beats!',
                         text: htmlBody
-                    }, (err, info) => { if (error) console.log({error}) });
+                    }, (error, info) => { if (error) console.log({error}) });
 
                     res.status(200).send({ message: "Payment intent handled successfully!"});
                     break;
