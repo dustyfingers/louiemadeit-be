@@ -15,11 +15,11 @@ const dbOpts = require("./config/db"),
     env = require("./config/env");
 
 // import routes
-const authRoutes = require("./api/routes/auth/auth"),
-    userRoutes = require("./api/routes/user/user"),
-    trackRoutes = require("./api/routes/track/track"),
-    s3Routes = require("./api/routes/s3/s3"),
-    stripeRoutes = require("./api/routes/stripe/stripe");
+const authRoutes = require("./api/routes/auth"),
+    userRoutes = require("./api/routes/user"),
+    trackRoutes = require("./api/routes/track"),
+    s3Routes = require("./api/routes/s3"),
+    stripeRoutes = require("./api/routes/stripe");
 
 const corsWhitelist = [env.origin, undefined];
 

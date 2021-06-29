@@ -1,8 +1,8 @@
-const { stripe } = require('../../../config/stripeConfig');
+const { stripe } = require('../../config/stripeConfig');
 const passport = require('passport');
 const bcrypt = require('bcryptjs');
 
-const User = require('../../models/User');
+const User = require('../models/User');
 
 module.exports = {
     signUp: async (req, res, next) => {

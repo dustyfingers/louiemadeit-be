@@ -1,10 +1,5 @@
-const { stripe } = require("stripe");
 const express = require("express");
-const passport = require("passport");
-const bcrypt = require("bcryptjs");
-
-const User = require("../../models/User");
-const authController = require("../../controllers/auth/authController");
+const authController = require("../controllers/auth");
 
 const router = express.Router();
 

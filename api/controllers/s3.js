@@ -1,6 +1,6 @@
 const {
     generateUrlHelper
-} = require("../../../helpers/s3");
+} = require("../../helpers/s3");
 
 module.exports = {
     generatePutUrl: async (req, res) => {

@@ -1,8 +1,8 @@
-const { stripe } = require('../../../config/stripeConfig');
-const { calculateOrderAmount } = require('../../../helpers/cart');
-const Track = require("../../models/Track");
-const transporter = require('../../../config/nodemailerConfig');
-const { generateUrlHelper } = require('../../../helpers/s3');
+const { stripe } = require('../../config/stripeConfig');
+const { calculateOrderAmount } = require('../../helpers/cart');
+const Track = require("../models/Track");
+const transporter = require('../../config/nodemailerConfig');
+const { generateUrlHelper } = require('../../helpers/s3');
 
 module.exports = {
     createPaymentIntent: async (req, res) => {

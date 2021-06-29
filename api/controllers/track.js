@@ -1,8 +1,8 @@
 // import models 
-const Track = require("../../models/Track");
+const Track = require("../models/Track");
 
-const { generateUrlHelper } = require("../../../helpers/s3");
-const { stripe } = require("../../../config/stripeConfig");
+const { generateUrlHelper } = require("../../helpers/s3");
+const { stripe } = require("../../config/stripeConfig");
 
 module.exports = {
     createTrack: async (req, res) => {
