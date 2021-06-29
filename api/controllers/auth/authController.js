@@ -1,20 +1,20 @@
 const { stripe } = require('../../../config/stripeConfig');
-const express = require("express");
-const passport = require("passport");
-const bcrypt = require("bcryptjs");
+const passport = require('passport');
+const bcrypt = require('bcryptjs');
 
-const User = require("../../models/User");
+const User = require('../../models/User');
 
 module.exports = {
     signUp: async (req, res, next) => {
-        User.findOne({ email: req.body.email }, async (err, doc) => {
+        const { email, password } = req.body;
+        User.findOne({ email }, async (err, doc) => {
             if (err) res.status(400).send({ status: 0, message: "Error Creating User"});
             if (doc) res.status(400).send({ status: 0, message: "User Already Exists"});
-            if (!doc) {
-                const stripeCustomer = await stripe.customers.create({ email: req.body.email });
-                const hashedPassword = await bcrypt.hash(req.body.password, 10);
+            else {
+                const stripeCustomer = await stripe.customers.create({ email });
+                const hashedPassword = await bcrypt.hash(password, 10);
                 const newUser = new User({
-                    email: req.body.email,
+                    email,
                     hash: hashedPassword,
                     stripeCustomerId: stripeCustomer.id
                 });
@@ -23,7 +23,13 @@ module.exports = {
     
                 passport.authenticate('local', (err, user) => {
                     req.logIn(user, (err) => {
-                        if (err) throw err;
+                        if (err) {
+                            res.status(400).send({
+                                status: 0,
+                                error: err,
+                                message: "User created but there was an error logging you in."
+                            });
+                        }
                         res.status(200).send({
                             status: 1,
                             user: { email: newUser.email, isAdmin: newUser.isAdmin, id: newUser._id },
