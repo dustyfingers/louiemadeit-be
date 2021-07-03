@@ -12,11 +12,11 @@ const createExampleUser = async () => {
   return exampleUser;
 }
 
-beforeEach(async done => {
+beforeAll(async done => {
   mongoose.connect(process.env.DB_PATH, { useNewUrlParser: true, useUnifiedTopology: true }, () => done());
 });
 
-afterEach(done => {
+afterAll(done => {
   mongoose.connection.db.dropDatabase(() => 
     mongoose.connection.close(() => done()));
 });
