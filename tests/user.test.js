@@ -35,6 +35,7 @@ test('should create a new user', async () => {
 });
 
 test('should not create a user that already exists', async () => {
+  const exampleUserBefore = await User.findOne({email: exampleUser.email});
   await request(app)
     .post('/auth/sign-up')
     .send({
@@ -49,7 +50,7 @@ test('should not create a user that already exists', async () => {
   expect(exampleUserAfter).not.toBeNull();
   
   // check for original data to match
-  expect(exampleUserAfter).toMatchObject(exampleUser);
+  expect(exampleUserAfter).toMatchObject(exampleUserBefore);
 });
 
 test('should log in user when given correct credentials', async () => {
