@@ -44,7 +44,10 @@ module.exports = {
     signIn: async (req, res, next) => {
         passport.authenticate("local", (err, user, info) => {
             if (err) throw err;
-            if (!user) res.send("No User Exists");
+            if (!user) res.status(401).send({
+                status: 0,
+                message: "There was an error logging you in."
+            });
             else {
                 req.logIn(user, (err) => {
                     if (err) throw err;

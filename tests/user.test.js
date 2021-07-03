@@ -6,11 +6,12 @@ const bcrypt = require('bcryptjs');
 const User = require('../api/models/User');
 
 let exampleUser = { email: 'testymail@example.com' };
+const exampleUserPassword = 'woohoofakepw123!';
 
 beforeAll(async done => {
   mongoose.connect(process.env.DB_PATH, { useNewUrlParser: true, useUnifiedTopology: true }, () => done());
 
-  exampleUser.hash = await bcrypt.hash('woohoofakepw123!', 10);
+  exampleUser.hash = await bcrypt.hash(exampleUserPassword, 10);
   exampleUser.stripeCustomerId = await bcrypt.hash(exampleUser.email, 10);
   await new User(exampleUser).save();
 });
@@ -24,7 +25,7 @@ test('should create a new user', async () => {
   const response = await request(app)
     .post('/auth/sign-up')
     .send({
-      email: 'testemail@email.com',
+      email: 'email500@email.com',
       password: 'passwordhere123!'
     })
     .expect(200);
@@ -38,7 +39,7 @@ test('should not create a user that already exists', async () => {
     .post('/auth/sign-up')
     .send({
       email: exampleUser.email,
-      password: 'passwordhere123!'
+      password: exampleUserPassword
     })
     .expect(400);
 
@@ -49,4 +50,33 @@ test('should not create a user that already exists', async () => {
   
   // check for original data to match
   expect(exampleUserAfter).toMatchObject(exampleUser);
+});
+
+test('should log in user when given correct credentials', async () => {
+  const response = await request(app)
+    .post('/auth/sign-in')
+    .send({
+      email: exampleUser.email,
+      password: exampleUserPassword
+    })
+    .expect(200);
+
+  expect(response.body).toMatchObject({
+    status: 1,
+    user: {},
+    message: 'Successfully Authenticated',
+    cookies: {}
+  });
+});
+
+test('should not log in user when given incorrect credentials', async () => {
+  const response = await request(app)
+    .post('/auth/sign-in')
+    .send({
+      email: exampleUser.email,
+      password: 'wrongpassword'
+    })
+    .expect(401);
+
+  expect(response.body).toMatchObject({ status: 0, message: 'There was an error logging you in.' });
 });
