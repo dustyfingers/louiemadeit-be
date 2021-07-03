@@ -17,4 +17,6 @@ router.post("/sign-out", (req, res) => authController.signOut(req, res));
 
 // TODO: user forgot password
 
+// TODO: user email verification
+
 module.exports = router;
