@@ -1,9 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
-// import controllers, middlewares
 const userController = require("../controllers/user");
 
-router.get("/:user_id", (req, res) => userController.fetchUser(req, res));
+router.get("/:user_id", (req, res) => {
+    console.log(`${Date()} GET /user/${req.query.user_id}`);
+    userController.fetchUser(req, res);
+});
+
+// TODO: edit user profile/email?
 
 module.exports = router;

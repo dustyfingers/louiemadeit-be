@@ -2,7 +2,6 @@ const app = require('../server');
 const mongoose = require('mongoose');
 const request = require('supertest');
 const bcrypt = require('bcryptjs');
-const axios = require('axios');
 
 const User = require('../api/models/User');
 const Track = require('../api/models/Track');
@@ -53,8 +52,7 @@ test('signed in admin should be able to create track', async () => {
 });
 
 test('non admin should not be able to create track', async () => {
-
-    const response = request(app)
+    const response = await request(app)
         .post('/track/new')
         // ? .set() ?
         .send({

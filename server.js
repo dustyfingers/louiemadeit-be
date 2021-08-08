@@ -1,6 +1,5 @@
 require('dotenv').config()
 
-// import libs/other
 const express = require("express"),
     bodyParser = require("body-parser"),
     mongoose = require("mongoose"),
@@ -10,11 +9,9 @@ const express = require("express"),
     session = require("express-session"),
     MongoDBSession = require("connect-mongodb-session")(session);
 
-// import config files
 const dbOpts = require("./config/db"),
     env = require("./config/env");
 
-// import routes
 const authRoutes = require("./api/routes/auth"),
     userRoutes = require("./api/routes/user"),
     trackRoutes = require("./api/routes/track"),
@@ -23,14 +20,14 @@ const authRoutes = require("./api/routes/auth"),
 
 const corsWhitelist = [env.origin, undefined];
 
-// connect to db & create session store
+// * connect to db & create session store
 mongoose.connect(env.dbPath, dbOpts);
 const store = MongoDBSession({
     uri: env.dbPath,
     collection: 'sessions'
 });
 
-// create express server & config middleware
+// * create express server & config middleware (cors, sessions, etc)
 const server = express();
 server.use(express.json());
 server.use(bodyParser.urlencoded({ extended: true }));
@@ -53,7 +50,7 @@ server.use(session({
     store
 }));
 
-// passport setup
+// * passport setup
 server.use(passport.initialize());
 server.use(passport.session());
 require("./config/passportConfig")(passport);
