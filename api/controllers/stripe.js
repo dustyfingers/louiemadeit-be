@@ -92,8 +92,11 @@ module.exports = {
     fetchPurchasedTracks: async (req, res) => {
         try {
             const { stripeCustomerId } = req.user;
+            console.log({stripeCustomerId});
             const allStripeOrders = await stripe.paymentIntents.list({customer: stripeCustomerId});
+            console.log({allStripeOrders})
             const succeededOrders = allStripeOrders.data.filter(order => order.status === 'succeeded');
+            console.log({succeededOrders})
             let stripeProductsPurchased = [], purchasedTracks = [];
 
             for (let i = 0; i < succeededOrders.length; i++) {
@@ -114,6 +117,8 @@ module.exports = {
                 if (trackPurchasedAsExclusive) purchasedTracks.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl, stemsGetUrl});
                 else purchasedTracks.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl});
             }
+
+            console.log({purchasedTracks})
             
             res.status(200).send({message: "Purchased tracks fetched successfully!", purchasedTracks});
         } catch (error) {
