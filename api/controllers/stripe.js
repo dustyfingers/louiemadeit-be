@@ -107,7 +107,9 @@ module.exports = {
     
             for (let i = 0; i < stripeProductsPurchased.length; i++) {
                 const track = await Track.find({stripeProduct: stripeProductsPurchased[i][0]});
+                console.log({track})
                 const { metadata: { name } } = await stripe.prices.retrieve(stripeProductsPurchased[i][1]);
+                console.log({name})
                 const trackPurchasedAsExclusive = name === "exclusive";
                 const taggedGetUrl = await generateUrlHelper("get", { Key: track[0].taggedVersion });
                 const untaggedGetUrl = await generateUrlHelper("get",  { Key: track[0].untaggedVersion });
