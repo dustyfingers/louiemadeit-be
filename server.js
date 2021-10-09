@@ -40,6 +40,7 @@ server.use(cors({ origin: (og, cb) => {
 server.use(session({
     secret: envConfig.sessionSecret,
     saveUninitialized: false,
+    resave: true,
     rolling: true,
     proxy: envConfig.origin === 'http://localhost:3000' ? undefined : true,
     cookie: {

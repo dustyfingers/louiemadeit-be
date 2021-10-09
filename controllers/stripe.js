@@ -101,18 +101,21 @@ module.exports = {
                     stripeProductsPurchased.push([product, price]);
                 }
             }
-    
+            
             for (let i = 0; i < stripeProductsPurchased.length; i++) {
                 const track = await Track.find({stripeProduct: stripeProductsPurchased[i][0]});
-                const { metadata: { name } } = await stripe.prices.retrieve(stripeProductsPurchased[i][1]);
-                const trackPurchasedAsExclusive = name === "exclusive";
-                const taggedGetUrl = await generateUrlHelper("get", { Key: track[0].taggedVersion });
-                const untaggedGetUrl = await generateUrlHelper("get",  { Key: track[0].untaggedVersion });
-                const coverArtGetUrl = await generateUrlHelper("get", { Key: track[0].coverArt });
-                const stemsGetUrl = await generateUrlHelper("get", { Key: track[0].stems });
 
-                if (trackPurchasedAsExclusive) purchasedTracks.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl, stemsGetUrl});
-                else purchasedTracks.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl});
+                if (track.length) {
+                    const { metadata: { name } } = await stripe.prices.retrieve(stripeProductsPurchased[i][1]);
+                    const trackPurchasedAsExclusive = name === "exclusive";
+                    const taggedGetUrl = await generateUrlHelper("get", { Key: track[0].taggedVersion });
+                    const untaggedGetUrl = await generateUrlHelper("get",  { Key: track[0].untaggedVersion });
+                    const coverArtGetUrl = await generateUrlHelper("get", { Key: track[0].coverArt });
+                    const stemsGetUrl = await generateUrlHelper("get", { Key: track[0].stems });
+    
+                    if (trackPurchasedAsExclusive) purchasedTracks.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl, stemsGetUrl});
+                    else purchasedTracks.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl});
+                }
             }
             
             res.status(200).send({message: "Purchased tracks fetched successfully!", purchasedTracks});
