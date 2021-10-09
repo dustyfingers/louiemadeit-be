@@ -44,7 +44,7 @@ server.use(session({
     rolling: true,
     proxy: envConfig.origin === 'http://localhost:3000' ? undefined : true,
     cookie: {
-        maxAge: 86400,
+        maxAge: 86400000,
         sameSite: envConfig.sameSite,
         secure: envConfig.secure,
         httpOnly: true  
