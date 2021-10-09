@@ -37,19 +37,18 @@ module.exports = {
         try {
             const packs = await Pack.find().exec()
 
-            if (packs.length !== 0) {
-                // for each pack generate the proper pack and cover art get urls and attach it to the pack object
-                for (let i = 0; i < packs.length; i++) {
-                    let taggedVersion = packs[i].taggedVersion
-                    let coverArt = packs[i].coverArt
-                    packs[i].taggedVersionUrl = await generateUrlHelper('get', { Key: taggedVersion})
-                    packs[i].coverArtUrl = await generateUrlHelper('get', { Key: coverArt })
-                }
+            if (packs.length) {
+                // for each pack generate the proper zip and cover art get urls 
+                const newPacks = await Promise.all(packs.map(async pack => ({ 
+                    ...pack._doc, 
+                    coverArtUrl: await generateUrlHelper('get', { Key: pack.coverArt }), 
+                    zipUrl: await generateUrlHelper('get', { Key: pack.zip }) 
+                })));
 
                 res.status(200).send({
                     status: 1,
                     message: 'Here are the packs for the shop!',
-                    packs
+                    packs: newPacks,
                 })
             } else {
                 res.status(200).send({

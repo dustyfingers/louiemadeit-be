@@ -10,7 +10,7 @@ router.post('/new', isAdmin, (req, res) => {
     packController.createPack(req, res)
 });
 
-// fetch all packss (store page)
+// fetch all packs (store page)
 router.get('/all', (req, res) => {
     console.log(`${Date()} GET /packs/all`)
     packController.fetchAllCurrentPacks(req, res)

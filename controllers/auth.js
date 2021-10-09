@@ -62,7 +62,6 @@ module.exports = {
         })(req, res, next);
     },
     fetchCurrentUser: (req, res) => {
-        console.log(req.session)
         if (req.user) {
             res.status(200).send({ 
                 user: { 
