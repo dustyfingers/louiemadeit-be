@@ -7,21 +7,18 @@ const { stripe } = require('../config/stripeConfig')
 module.exports = {
     createPack: async (req, res) => {
         try {
-            console.log(req.body)
-            // const stripePack = await stripe.products.create({ name: req.body.packName })
+            const stripePack = await stripe.products.create({ name: req.body.packName })
 
-            // await stripe.prices.create({
-            //     product: stripePack.id,
-            //     currency: 'usd',
-            //     unit_amount: 1999
-            // })
+            await stripe.prices.create({
+                product: stripePack.id,
+                currency: 'usd',
+                unit_amount: 1999
+            })
 
-            // const pack = await Pack.create({ 
-            //     ...req.body,
-            //     stripeProduct: stripePack.id 
-            // })
-
-            let pack = 'thing'
+            const pack = await Pack.create({ 
+                ...req.body,
+                stripeProduct: stripePack.id 
+            })
 
             res.status(200).send({
                 status: 1,

@@ -2,7 +2,7 @@ let mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
 let Pack = new Schema({
-    name: {
+    packName: {
         type: String,
         required: true,
         unique: true
