@@ -1,4 +1,4 @@
-const { stripe } = require('../../config/stripeConfig');
+const { stripe } = require('../config/stripeConfig');
 const passport = require('passport');
 const bcrypt = require('bcryptjs');
 

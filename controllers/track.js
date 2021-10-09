@@ -1,13 +1,16 @@
 // import models 
-const Track = require("../models/Track");
+const Track = require('../models/Track');
 
-const { generateUrlHelper } = require("../../helpers/s3");
-const { stripe } = require("../../config/stripeConfig");
+const { generateUrlHelper } = require('../helpers/s3');
+const { stripe } = require('../config/stripeConfig');
 
 module.exports = {
     createTrack: async (req, res) => {
+        console.log('this happens!')
         try {
             const stripeTrack = await stripe.products.create({ name: req.body.trackName });
+
+            console.log(stripeTrack)
 
             const leaseStripePriceStems = await stripe.prices.create({
                 product: stripeTrack.id,
@@ -36,6 +39,18 @@ module.exports = {
                 }
             });
 
+            console.log('this happens!')
+
+            console.log({ 
+                ...req.body, 
+                prices: {
+                    exclusiveStripePrice: exclusiveStripePrice.id, 
+                    leaseStripePriceMaster: leaseStripePriceMaster.id,
+                    leaseStripePriceStems: leaseStripePriceStems.id
+                },
+                stripeProduct: stripeTrack.id 
+            })
+
             const track = await Track.create({ 
                 ...req.body, 
                 prices: {
@@ -45,6 +60,8 @@ module.exports = {
                 },
                 stripeProduct: stripeTrack.id 
             });
+
+            console.log(track)
 
             res.status(200).send({
                 status: 1,

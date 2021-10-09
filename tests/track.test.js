@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const request = require('supertest');
 const bcrypt = require('bcryptjs');
 
-const User = require('../api/models/User');
-const Track = require('../api/models/Track');
+const User = require('../models/User');
+const Track = require('../models/Track');
 
 let exampleUser = { email: 'testymail@example.com' };
 const exampleUserPassword = 'woohoofakepw123!';
@@ -43,7 +43,7 @@ test('signed in admin should be able to upload files to aws s3', async () => {
 
 test('signed in admin should be able to create track', async () => {
     await request(app)
-        .post('/track/new')
+        .post('/tracks/new')
         .send(exampleTrack)
         .expect(200);
     
@@ -53,7 +53,7 @@ test('signed in admin should be able to create track', async () => {
 
 test('non admin should not be able to create track', async () => {
     const response = await request(app)
-        .post('/track/new')
+        .post('/tracks/new')
         // ? .set() ?
         .send({
 
