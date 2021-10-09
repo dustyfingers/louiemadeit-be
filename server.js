@@ -39,14 +39,14 @@ server.use(cors({ origin: (og, cb) => {
 }, credentials: true }))
 server.use(session({
     secret: envConfig.sessionSecret,
-    resave: true,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    rolling: true,
     proxy: envConfig.origin === 'http://localhost:3000' ? undefined : true,
     cookie: {
         maxAge: 86400,
         sameSite: envConfig.sameSite,
-        secure: envConfig.secure ? envConfig.secure : false ,
-        httpOnly: true
+        secure: envConfig.secure,
+        httpOnly: true  
     },
     store
 }))
