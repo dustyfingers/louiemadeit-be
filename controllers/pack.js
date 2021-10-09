@@ -9,7 +9,7 @@ module.exports = {
         try {
             const stripePack = await stripe.products.create({ name: req.body.packName })
 
-            await stripe.prices.create({
+            const stripePrice = await stripe.prices.create({
                 product: stripePack.id,
                 currency: 'usd',
                 unit_amount: 1999
@@ -17,6 +17,7 @@ module.exports = {
 
             const pack = await Pack.create({ 
                 ...req.body,
+                stripePrice: stripePrice.id,
                 stripeProduct: stripePack.id 
             })
 

@@ -12,6 +12,11 @@ let Pack = new Schema({
         required: true,
         unique: true
     },
+    stripePrice: {
+        type: String,
+        required: true,
+        unique: true
+    },
     zip: {
         type: String,
         required: true,
