@@ -92,11 +92,8 @@ module.exports = {
     fetchPurchasedTracks: async (req, res) => {
         try {
             const { stripeCustomerId } = req.user;
-            console.log({stripeCustomerId});
             const allStripeOrders = await stripe.paymentIntents.list({customer: stripeCustomerId});
-            console.log({allStripeOrders})
             const succeededOrders = allStripeOrders.data.filter(order => order.status === 'succeeded');
-            console.log({succeededOrders})
             let stripeProductsPurchased = [], purchasedTracks = [];
 
             for (let i = 0; i < succeededOrders.length; i++) {
@@ -107,9 +104,7 @@ module.exports = {
     
             for (let i = 0; i < stripeProductsPurchased.length; i++) {
                 const track = await Track.find({stripeProduct: stripeProductsPurchased[i][0]});
-                console.log({track})
                 const { metadata: { name } } = await stripe.prices.retrieve(stripeProductsPurchased[i][1]);
-                console.log({name})
                 const trackPurchasedAsExclusive = name === "exclusive";
                 const taggedGetUrl = await generateUrlHelper("get", { Key: track[0].taggedVersion });
                 const untaggedGetUrl = await generateUrlHelper("get",  { Key: track[0].untaggedVersion });
@@ -119,8 +114,6 @@ module.exports = {
                 if (trackPurchasedAsExclusive) purchasedTracks.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl, stemsGetUrl});
                 else purchasedTracks.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl});
             }
-
-            console.log({purchasedTracks})
             
             res.status(200).send({message: "Purchased tracks fetched successfully!", purchasedTracks});
         } catch (error) {
