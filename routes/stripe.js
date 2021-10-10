@@ -15,10 +15,10 @@ router.post("/webhooks/handle-payment-intent", (req, res) => {
     stripeController.handlePaymentIntent(req, res);
 });
 
-// fetch a users purchased tracks
-router.get("/purchased-tracks", (req, res) => {
-    console.log(`${Date()} GET /stripe/purchased-tracks`);
-    stripeController.fetchPurchasedTracks(req, res);
+// fetch a users purchases
+router.get("/purchases", (req, res) => {
+    console.log(`${Date()} GET /stripe/purchases`);
+    stripeController.fetchPurchases(req, res);
 });
 
 module.exports = router;

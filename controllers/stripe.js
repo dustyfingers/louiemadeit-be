@@ -13,9 +13,9 @@ module.exports = {
             let meta = {}
 
             for (let i = 0; i < items.length; i++) {
-                let productID = items[i].trackID
-                if (items[i].type === 'track') productID = items[i].trackID
-                else if (items[i].type === 'pack') productID = items[i].packID
+                let productID
+                if (items[i].trackID) productID = items[i].trackID
+                else if (items[i].packID) productID = items[i].packID
                 meta[productID] = items[i].priceID
             }
 
@@ -120,36 +120,45 @@ module.exports = {
             res.status(400).send({message: 'Error while handling payment intent.', error})
         }
     },
-    fetchPurchasedTracks: async (req, res) => {
+    fetchPurchases: async (req, res) => {
         try {
             const { stripeCustomerId } = req.user
             const allStripeOrders = await stripe.paymentIntents.list({customer: stripeCustomerId})
             const succeededOrders = allStripeOrders.data.filter(order => order.status === 'succeeded')
-            let stripeProductsPurchased = [], purchasedTracks = []
+            let stripeProductsPurchased = [], purchases = []
 
             for (let i = 0; i < succeededOrders.length; i++) {
-                for (const [product, price] of Object.entries(succeededOrders[i].metadata)) {
+                for (let [product, price] of Object.entries(succeededOrders[i].metadata)) {
                     stripeProductsPurchased.push([product, price])
                 }
             }
             
             for (let i = 0; i < stripeProductsPurchased.length; i++) {
-                const track = await Track.find({stripeProduct: stripeProductsPurchased[i][0]})
+                const product = await stripe.products.retrieve(stripeProductsPurchased[i][0])
 
-                if (track.length) {
-                    const { metadata: { name } } = await stripe.prices.retrieve(stripeProductsPurchased[i][1])
-                    const trackPurchasedAsExclusive = name === "exclusive"
-                    const taggedGetUrl = await generateUrlHelper("get", { Key: track[0].taggedVersion })
-                    const untaggedGetUrl = await generateUrlHelper("get",  { Key: track[0].untaggedVersion })
-                    const coverArtGetUrl = await generateUrlHelper("get", { Key: track[0].coverArt })
-                    const stemsGetUrl = await generateUrlHelper("get", { Key: track[0].stems })
-    
-                    if (trackPurchasedAsExclusive) purchasedTracks.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl, stemsGetUrl})
-                    else purchasedTracks.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl})
+                if (product.metadata.product_type === 'track') {
+                    const track = await Track.find({stripeProduct: product.id})
+                    if (track.length) {
+                        const { metadata: { name } } = await stripe.prices.retrieve(stripeProductsPurchased[i][1])
+                        const trackPurchasedAsExclusive = name === "exclusive"
+                        const taggedGetUrl = await generateUrlHelper("get", { Key: track[0].taggedVersion })
+                        const untaggedGetUrl = await generateUrlHelper("get",  { Key: track[0].untaggedVersion })
+                        const coverArtGetUrl = await generateUrlHelper("get", { Key: track[0].coverArt })
+                        const stemsGetUrl = await generateUrlHelper("get", { Key: track[0].stems })
+        
+                        if (trackPurchasedAsExclusive) purchases.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl, stemsGetUrl})
+                        else purchases.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl})
+                    }
+                } else if (product.metadata.product_type === 'pack') {
+                    const pack = await Pack.find({stripeProduct: product.id})
+                    if (pack.length) {
+                        const zipGetUrl = await generateUrlHelper("get", { Key: pack[0].zip })
+                        const coverArtGetUrl = await generateUrlHelper("get", { Key: pack[0].coverArt })
+                        purchases.push({packName: pack[0].packName, coverArtGetUrl, zipGetUrl})
+                    }
                 }
             }
-            
-            res.status(200).send({message: "Purchased tracks fetched successfully!", purchasedTracks})
+            res.status(200).send({message: "Purchased tracks fetched successfully!", purchases})
         } catch (error) {
             res.status(400).send({message: 'Error while fetching purchased tracks.', error})
         }
