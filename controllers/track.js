@@ -7,7 +7,7 @@ const { stripe } = require('../config/stripeConfig');
 module.exports = {
     createTrack: async (req, res) => {
         try {
-            const stripeTrack = await stripe.products.create({ name: req.body.trackName });
+            const stripeTrack = await stripe.products.create({ name: req.body.trackName, metadata: { product_type: 'track' } });
 
             const leaseStripePriceStems = await stripe.prices.create({
                 product: stripeTrack.id,

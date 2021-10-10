@@ -7,7 +7,7 @@ const { stripe } = require('../config/stripeConfig')
 module.exports = {
     createPack: async (req, res) => {
         try {
-            const stripePack = await stripe.products.create({ name: req.body.packName })
+            const stripePack = await stripe.products.create({ name: req.body.packName, metadata: { product_type: 'pack' } })
 
             const stripePrice = await stripe.prices.create({
                 product: stripePack.id,

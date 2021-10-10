@@ -24,6 +24,7 @@ ORIGIN=http://localhost:3000
 SAME_SITE=lax
 EMAIL=
 EMAIL_PASSWORD=
+SALES_EMAIL=
 
 # step 3:
 

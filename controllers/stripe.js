@@ -1,6 +1,7 @@
 const { stripe } = require('../config/stripeConfig')
 const { calculateOrderAmount } = require('../helpers/cart')
 const Track = require("../models/Track")
+const Pack = require('../models/Pack')
 const transporter = require('../config/nodemailerConfig')
 const { generateUrlHelper } = require('../helpers/s3')
 
@@ -46,43 +47,71 @@ module.exports = {
                     htmlBody += 'Thanks for your support,\n'
                     htmlBody += 'louiemadeit\n\n\n\n\n'
                     
-                    for (const [key, price_id] of Object.entries(paymentData.metadata)) {
+                    for (let price_id of Object.values(paymentData.metadata)) {
                         const price = await stripe.prices.retrieve(price_id)
                         const product = await stripe.products.retrieve(price.product)
-                        const track = await Track.findOne({stripeProduct: product.id})
 
-                        const taggedGetUrl = await generateUrlHelper("get", { Key: track.taggedVersion })
-                        const untaggedGetUrl = await generateUrlHelper("get",  { Key: track.untaggedVersion })
-                        const coverArtGetUrl = await generateUrlHelper("get", { Key: track.coverArt })
+                        if (product.metadata.product_type === 'track') {
+                            const track = await Track.findOne({stripeProduct: product.id})
+                            const taggedGetUrl = await generateUrlHelper("get", { Key: track.taggedVersion })
+                            const untaggedGetUrl = await generateUrlHelper("get",  { Key: track.untaggedVersion })
+                            const coverArtGetUrl = await generateUrlHelper("get", { Key: track.coverArt })
+    
+                            htmlBody += `${track.trackName.toUpperCase()}\n\n`
+                            htmlBody += "TAGGED VERSION:\n"
+                            htmlBody += taggedGetUrl + " \n\n"
+                            htmlBody += "UNTAGGED VERSION:\n"
+                            htmlBody += untaggedGetUrl + " \n\n"
+                            htmlBody += "COVER ART:\n"
+                            htmlBody += coverArtGetUrl + " \n\n"
+                            if (price.metadata.name === 'exclusive' || price.metadata.name === 'lease') {
+                                await Track.findOneAndUpdate({ stripeProduct: product.id }, { hasBeenSoldAsExclusive: true })
+                                const stemsGetUrl = await generateUrlHelper("get",  { Key: track.stems })
+                                htmlBody += "STEMS:\n"
+                                htmlBody += stemsGetUrl + " \n"
+                            }
+                            htmlBody += '\n\n'
+                        } else if (product.metadata.product_type === 'pack') {
+                            const pack = await Pack.findOne({stripeProduct: product.id})
+                            const zipGetUrl = await generateUrlHelper("get",  { Key: pack.zip })
+                            const coverArtGetUrl = await generateUrlHelper("get", { Key: pack.coverArt })
 
-                        htmlBody += `${track.trackName.toUpperCase()}\n\n`
-                        htmlBody += "TAGGED VERSION:\n"
-                        htmlBody += taggedGetUrl + " \n\n"
-                        htmlBody += "UNTAGGED VERSION:\n"
-                        htmlBody += untaggedGetUrl + " \n\n"
-                        htmlBody += "COVER ART:\n"
-                        htmlBody += coverArtGetUrl + " \n\n"
-                        if (price.metadata.name === 'exclusive' || price.metadata.name === 'lease') {
-                            await Track.findOneAndUpdate({ stripeProduct: product.id }, { hasBeenSoldAsExclusive: true })
-                            const stemsGetUrl = await generateUrlHelper("get",  { Key: track.stems })
-                            htmlBody += "STEMS:\n"
-                            htmlBody += stemsGetUrl + " \n"
+                            htmlBody += `${pack.packName.toUpperCase()}\n\n`
+                            htmlBody += "ZIP FILES:\n"
+                            htmlBody += zipGetUrl + " \n\n"
+                            htmlBody += "COVER ART:\n"
+                            htmlBody += coverArtGetUrl + " \n\n"
+                            htmlBody += '\n\n'
                         }
-                        htmlBody += '\n\n'
                     }
 
                     transporter.sendMail({
                         from: process.env.EMAIL,
                         to: paymentData.receipt_email,
-                        subject: 'Thank You For Purchasing My Beats!',
+                        subject: 'Thank You For Purchasing!',
                         text: htmlBody
-                    }, (error, info) => { if (error) console.log({error}) })
+                    }, (error, info) => { 
+                        if (error) console.log({error})
+                        htmlBody = 'Woohoo! You made a sale! '
+                        htmlBody += 'Someone purchased $' + paymentData.amount / 100 + ' of goods from louiemadeit.com.\n\n\n'
+    
+                        htmlBody += 'Freakin Cool!\n'
+                        htmlBody += 'louiemadeit\n\n\n\n\n'
+    
+                        transporter.sendMail({
+                            from: process.env.EMAIL,
+                            to: process.env.SALES_EMAIL,
+                            subject: 'Cha Ching! You just made a sale!',
+                            text: htmlBody
+                        }, (error, info) => { if (error) console.log({error}) })
+                    })
+
 
                     res.status(200).send({ message: "Payment intent handled successfully!"})
                     break
                     
                 default:
-                    break
+                    return
             }
 
             res.status(200).send()
