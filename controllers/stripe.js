@@ -147,14 +147,14 @@ module.exports = {
                         const stemsGetUrl = await generateUrlHelper("get", { Key: track[0].stems })
         
                         if (trackPurchasedAsExclusive) purchases.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl, stemsGetUrl})
-                        else purchases.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl})
+                        else if (!purchases.find(purchase => purchase.trackName === track[0].trackName)) purchases.push({trackName: track[0].trackName, taggedGetUrl, untaggedGetUrl, coverArtGetUrl})
                     }
                 } else if (product.metadata.product_type === 'pack') {
                     const pack = await Pack.find({stripeProduct: product.id})
                     if (pack.length) {
                         const zipGetUrl = await generateUrlHelper("get", { Key: pack[0].zip })
                         const coverArtGetUrl = await generateUrlHelper("get", { Key: pack[0].coverArt })
-                        purchases.push({packName: pack[0].packName, coverArtGetUrl, zipGetUrl})
+                        if (!purchases.find(purchase => purchase.packName === pack[0].packName)) purchases.push({packName: pack[0].packName, coverArtGetUrl, zipGetUrl})
                     }
                 }
             }
