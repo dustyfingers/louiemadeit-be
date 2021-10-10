@@ -12,6 +12,9 @@ module.exports = {
             const { items } = req.body
             let meta = {}
 
+            console.log(req.user)
+            console.log(req.body)
+
             for (let i = 0; i < items.length; i++) {
                 let productID
                 if (items[i].trackID) productID = items[i].trackID
@@ -114,7 +117,7 @@ module.exports = {
                     return
             }
 
-            res.status(200).send()
+            res.status(200).end()
 
         } catch (error) {
             res.status(400).send({message: 'Error while handling payment intent.', error})
