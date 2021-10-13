@@ -1,26 +1,22 @@
-const app = require('../server');
-const mongoose = require('mongoose');
-const request = require('supertest');
-const bcrypt = require('bcryptjs');
+const app = require('../server')
+const mongoose = require('mongoose')
+const request = require('supertest')
+const bcrypt = require('bcryptjs')
 
-const User = require('../models/User');
-const Track = require('../models/Track');
+const User = require('../models/User')
+const Track = require('../models/Track')
 
-let exampleUser = { email: 'testymail@example.com' };
-const exampleUserPassword = 'woohoofakepw123!';
+const exampleAdminUser = { 
+    email: 'adminmail@example.com', 
+    password: 'woohoofakepw123',
+    isAdmin: true
+}
 
-beforeAll(async done => {
-    mongoose.connect(process.env.DB_PATH, { useNewUrlParser: true, useUnifiedTopology: true }, () => done());
-
-    exampleUser.hash = await bcrypt.hash(exampleUserPassword, 10);
-    exampleUser.stripeCustomerId = await bcrypt.hash(exampleUser.email, 10);
-    await new User(exampleUser).save();
-});
-
-afterAll(done => {
-    mongoose.connection.db.dropDatabase(() => 
-        mongoose.connection.close(() => done()));
-});
+const exampleNonAdminUser = {
+    email: 'usermail@example.com', 
+    password: 'woohoofakepw123!!',
+    isAdmin: false
+}
 
 const exampleTrack = {
     trackName: 'example track #23424545778',
@@ -30,33 +26,68 @@ const exampleTrack = {
     coverArt: 'example cover art.jpg',
 }
 
-test('signed in admin should be able to upload files to aws s3', async () => {
-    const s3GenPutUrl = '/s3/generate-put-url';
+beforeAll(async () => {
+    await mongoose.connect(process.env.DB_PATH, { useNewUrlParser: true, useUnifiedTopology: false });
+  
+    exampleAdminUser.hash = await bcrypt.hash(exampleAdminUser.password, 10)
+    exampleAdminUser.stripeCustomerId = await bcrypt.hash(exampleAdminUser.email, 10)
 
-    // ? check out the handleUploadToS3 function for help maybe?
-    // const response = await request(app)
-        // post()
-        // .attach('avatar', 'tests/fixtures/profile-pic.jpg')
-        // .send()
-        // .expect(200)
+    exampleNonAdminUser.hash = await bcrypt.hash(exampleNonAdminUser.password, 10)
+    exampleNonAdminUser.stripeCustomerId = await bcrypt.hash(exampleNonAdminUser.email, 10)
+
+    await new User(exampleAdminUser).save();
+    await new User(exampleNonAdminUser).save();
 });
 
-test('signed in admin should be able to create track', async () => {
+afterAll(done => {
+    mongoose.connection.db.dropDatabase(() => 
+        mongoose.connection.close(() => done()))
+})
+
+test('signed in admin should be able to create tracks', async () => {
+    let session = null
+
+    const response = await request(app)
+        .post('/auth/sign-in')
+        .send({
+            email: exampleAdminUser.email,
+            password: exampleAdminUser.password
+        })
+        .expect(200)
+    session = response.headers['set-cookie'][0].split(',').map(item => item.split(';')[0]).join(';')
+
+    await request(app)
+        .post('/tracks/new')
+        .set('Cookie', session)
+        .send(exampleTrack)
+        .expect(200)
+    
+    const track = await Track.findOne({ trackName: exampleTrack.trackName })
+    expect(track).not.toBeNull()
+})
+
+test('non admin should not be able to create tracks', async () => {
+    let session = null
+
+    const response = await request(app)
+        .post('/auth/sign-in')
+        .send({
+            email: exampleNonAdminUser.email,
+            password: exampleNonAdminUser.password
+        })
+        .expect(200)
+    session = response.headers['set-cookie'][0].split(',').map(item => item.split(';')[0]).join(';')
+
+    await request(app)
+        .post('/tracks/new')
+        .set('Cookie', session)
+        .send(exampleTrack)
+        .expect(401)
+})
+
+test('unauthenticated users should not be able to create tracks', async () => {
     await request(app)
         .post('/tracks/new')
         .send(exampleTrack)
-        .expect(200);
-    
-    const track = Track.findOne({ trackName: exampleTrack.trackName });
-    expect(track).not.toBeNull();
-});
-
-test('non admin should not be able to create track', async () => {
-    const response = await request(app)
-        .post('/tracks/new')
-        // ? .set() ?
-        .send({
-
-        })
-        .expect(401);
-});
+        .expect(401)
+})

@@ -7,7 +7,7 @@
     "dev": "env-cmd -f ./config/env/dev.env nodemon index.js",
     "start": "node index",
     "build": "npm install",
-    "test": "env-cmd -f ./config/env/test.env jest --watch --detectOpenHandles"
+    "test": "env-cmd -f ./config/env/test.env jest --watch --runInBand --detectOpenHandles --forceExit"
   },
   "keywords": [],
   "author": "",

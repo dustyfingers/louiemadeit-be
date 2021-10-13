@@ -5,13 +5,12 @@ const bcrypt = require('bcryptjs');
 
 const User = require('../models/User');
 
-let exampleUser = { email: 'testymail@example.com' };
-const exampleUserPassword = 'woohoofakepw123!';
+let exampleUser = { email: 'testymail@example.com', password: 'woohoofakepw123!' };
 
-beforeAll(async done => {
-  mongoose.connect(process.env.DB_PATH, { useNewUrlParser: true, useUnifiedTopology: true }, () => done());
+beforeAll(async () => {
+  await mongoose.connect(process.env.DB_PATH, { useNewUrlParser: true, useUnifiedTopology: false });
 
-  exampleUser.hash = await bcrypt.hash(exampleUserPassword, 10);
+  exampleUser.hash = await bcrypt.hash(exampleUser.password, 10);
   exampleUser.stripeCustomerId = await bcrypt.hash(exampleUser.email, 10);
   await new User(exampleUser).save();
 });
@@ -40,7 +39,7 @@ test('should not create a user that already exists', async () => {
     .post('/auth/sign-up')
     .send({
       email: exampleUser.email,
-      password: exampleUserPassword
+      password: exampleUser.password
     })
     .expect(400);
 
@@ -58,7 +57,7 @@ test('should log in user when given correct credentials', async () => {
     .post('/auth/sign-in')
     .send({
       email: exampleUser.email,
-      password: exampleUserPassword
+      password: exampleUser.password
     })
     .expect(200);
 
