@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const validator = require("validator");
+const mongoose = require('mongoose');
+const validator = require('validator');
 const Schema = mongoose.Schema;
 
 const User = new Schema({
@@ -9,7 +9,7 @@ const User = new Schema({
         required: true,
         validate(value) {
             if (!validator.isEmail(value)) throw new Error('Email is invalid');
-        }
+        },
     },
     hash: String,
     firstName: String,
@@ -18,13 +18,13 @@ const User = new Schema({
     resetPasswordExpiresAt: Date,
     isAdmin: {
         type: Boolean,
-        default: false
+        default: false,
     },
     stripeCustomerId: String,
     createdAt: {
         type: Date,
-        default: Date.now
-    }
+        default: Date.now,
+    },
 });
 
-module.exports = mongoose.model("User", User);
+module.exports = mongoose.model('User', User);

@@ -1,8 +1,9 @@
 const { stripe } = require('../config/stripeConfig')
-const { calculateOrderAmount } = require('../helpers/cart')
+const transporter = require('../config/nodemailerConfig')
 const Track = require("../models/Track")
 const Pack = require('../models/Pack')
-const transporter = require('../config/nodemailerConfig')
+
+const { calculateOrderAmount } = require('../helpers/cart')
 const { generateUrlHelper } = require('../helpers/s3')
 
 module.exports = {
@@ -11,9 +12,6 @@ module.exports = {
             const { stripeCustomerId, email } = req.user
             const { items } = req.body
             let meta = {}
-
-            console.log(req.user)
-            console.log(req.body)
 
             for (let i = 0; i < items.length; i++) {
                 let productID

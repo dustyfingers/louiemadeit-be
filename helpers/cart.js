@@ -7,8 +7,8 @@ module.exports = {
         for (let i = 0; i < items.length; i++) {
             const { unit_amount } = await stripe.prices.retrieve(items[i].priceID);
             total += unit_amount;
-        } 
+        }
 
         return total;
-    }
+    },
 };

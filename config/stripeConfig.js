@@ -1,10 +1,10 @@
 // import stripe secret key
-const { stripe_sk }= require("./env");
+const { stripe_sk } = require('./env');
 
 // import stripe
-const stripe = require("stripe")(stripe_sk);
+const stripe = require('stripe')(stripe_sk);
 
 module.exports = {
     stripe,
-    stripeStatementDescriptor: "louiemadeit llc"
+    stripeStatementDescriptor: 'louiemadeit llc',
 };

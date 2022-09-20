@@ -1,9 +1,9 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 
-const userController = require("../controllers/user");
+const userController = require('../controllers/user');
 
-router.get("/:user_id", (req, res) => {
+router.get('/:user_id', (req, res) => {
     console.log(`${Date()} GET /user/${req.params.user_id}`);
     userController.fetchUser(req, res);
 });

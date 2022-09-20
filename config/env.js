@@ -8,5 +8,5 @@ module.exports = {
     dbPath: process.env.DB_PATH,
     origin: process.env.ORIGIN,
     sameSite: process.env.SAME_SITE,
-    secure: process.env.SECURE
+    secure: process.env.SECURE,
 };

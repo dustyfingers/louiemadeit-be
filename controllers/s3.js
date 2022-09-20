@@ -1,37 +1,34 @@
-const {
-    generateUrlHelper
-} = require("../helpers/s3");
+const { generateUrlHelper } = require('../helpers/s3');
 
 module.exports = {
     generatePutUrl: async (req, res) => {
-        const {
-            Key,
-            ContentType
-        } = req.query;
+        const { Key, ContentType } = req.query;
 
-        const putUrl = await generateUrlHelper("put", {
+        const putUrl = await generateUrlHelper('put', {
             Key,
-            ContentType
+            ContentType,
         });
 
-        putUrl ? res.send({
-            putUrl
-        }) : res.send({
-            err: "There was an error"
-        });
+        putUrl
+            ? res.send({
+                  putUrl,
+              })
+            : res.send({
+                  err: 'There was an error',
+              });
     },
     generateGetUrl: async (req, res) => {
-        const {
-            Key
-        } = req.query;
-        const getUrl = await generateUrlHelper("get", {
-            Key
+        const { Key } = req.query;
+        const getUrl = await generateUrlHelper('get', {
+            Key,
         });
 
-        getUrl ? res.send({
-            getUrl
-        }) : res.send({
-            err: "There was an error"
-        });
-    }
+        getUrl
+            ? res.send({
+                  getUrl,
+              })
+            : res.send({
+                  err: 'There was an error',
+              });
+    },
 };
